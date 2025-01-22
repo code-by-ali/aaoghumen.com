@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .chips {
+    @apply p-2 border rounded-lg cursor-pointer flex gap-1 items-center text-sm font-medium transition duration-100;
+  }
+}
