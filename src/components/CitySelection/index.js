@@ -86,7 +86,7 @@ const CitySelection = () => {
               onClick={() => handleSelectedCity(city)}
               key={city.cityId}
               className={`chips ${
-                selectedCity === city.cityName
+                selectedCity.cityName === city.cityName
                   ? "text-orange1 bg-[#FFF5F1] border-orange1"
                   : " text-black1 bg-white border-[#CED3D8]"
               }  ${
