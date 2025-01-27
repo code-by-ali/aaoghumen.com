@@ -34,6 +34,30 @@ const apiService = {
       throw error;
     }
   },
+  getCategories: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_CATEGORIES, body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getPreTrips: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_PRE_TRIPS, body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getPlanTrips: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_PLAN_TRIPS, body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default apiService;

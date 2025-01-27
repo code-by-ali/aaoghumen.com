@@ -1,11 +1,11 @@
 import React from "react";
+import RoutesWrapper from "./Routes";
 import "./styles/main.scss";
-import Routes from "./Routes";
 
 function App() {
   return (
     <div className="">
-      <Routes />
+      <RoutesWrapper />
     </div>
   );
 }

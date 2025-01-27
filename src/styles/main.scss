@@ -7,3 +7,73 @@
     @apply p-2 border rounded-lg cursor-pointer flex gap-1 items-center text-sm font-medium transition duration-100;
   }
 }
+
+.radix-themes {
+  --default-font-family: "Public Sans", serif !important;
+}
+
+.MuiDrawer-paperAnchorBottom {
+  max-width: 430px !important;
+  margin: auto !important;
+  box-shadow: none !important;
+}
+
+.MuiModal-backdrop,
+.PrivateSwipeArea-root {
+  max-width: 430px !important;
+  margin: auto !important;
+}
+
+.rhap_container {
+  padding: 0px 16px 0px 8px;
+  background-color: #ed5722;
+  box-shadow: none;
+  border-radius: 8px;
+
+  .rhap_additional-controls,
+  .rhap_repeat-button {
+    display: none;
+  }
+}
+.custom-player .rhap_progress-filled {
+  background-color: #4f46e5;
+}
+
+.custom-player .rhap_progress-indicator {
+  background: #fff;
+}
+
+.custom-player .rhap_progress-bar {
+  background: #feffff;
+  height: 4px;
+}
+
+.rhap_download-progress {
+  background-color: #feffff;
+}
+
+.custom-player .rhap_time {
+  color: #fff;
+  font-size: 14px;
+}
+
+.custom-player .rhap_volume-bar {
+  background: #feffff;
+}
+
+.custom-player .rhap_volume-indicator {
+  background: #fff;
+}
+
+.rhap_horizontal-reverse .rhap_controls-section {
+  margin-right: 0px;
+}
+
+.rhap_controls-section {
+  flex: none;
+}
+
+.rhap_play-pause-button {
+  width: 25px;
+  height: 38px;
+}

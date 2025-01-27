@@ -6,12 +6,16 @@ import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux/store";
+import "@radix-ui/themes/styles.css";
+import { Theme } from "@radix-ui/themes";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
-      <App />
+      <Theme>
+        <App />
+      </Theme>
     </PersistGate>
   </Provider>
 );

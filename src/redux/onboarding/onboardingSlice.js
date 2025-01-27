@@ -7,6 +7,7 @@ const onboardingSlice = createSlice({
     time: "",
     language: "",
     pickPoint: "",
+    category: "",
     step: 0,
   },
   reducers: {
@@ -22,12 +23,21 @@ const onboardingSlice = createSlice({
     setPickPoint(state, action) {
       state.pickPoint = action.payload;
     },
+    setCategory(state, action) {
+      state.category = action.payload;
+    },
     setStep(state, action) {
       state.step = action.payload;
     },
   },
 });
 
-export const { setCity, setTime, setLanguage, setPickPoint, setStep } =
-  onboardingSlice.actions;
+export const {
+  setCity,
+  setTime,
+  setLanguage,
+  setPickPoint,
+  setCategory,
+  setStep,
+} = onboardingSlice.actions;
 export default onboardingSlice.reducer;
