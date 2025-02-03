@@ -6,6 +6,7 @@ const endpoints = {
   GET_CATEGORIES: "/cityCategory",
   GET_PRE_TRIPS: "preDefineTrips",
   GET_PLAN_TRIPS: "planLocations",
+  GET_STATIC_CONTENT: "staticConstant",
 };
 
 export default endpoints;

@@ -9,9 +9,15 @@ import {
 } from "../../redux/onboarding/onboardingSlice";
 import apiService from "../../services/api/apiServices";
 import Spinner from "../Spinner";
+import {
+  setPickPointList,
+  setSelectedFilters,
+} from "../../redux/filter/filterSlice";
 
 const PickPointSelection = () => {
   const { pickPoint, city } = useSelector((state) => state.onboarding);
+  const { contentData } = useSelector((state) => state.content);
+  const { selectedFilters } = useSelector((state) => state.filter);
   const [allPickPoint, setAllPickPoint] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPickPoint, setSelectedPickPoint] = useState(pickPoint);
@@ -38,6 +44,7 @@ const PickPointSelection = () => {
           return acc;
         }, []);
         setAllPickPoint(allSubOptions);
+        dispatch(setPickPointList(allSubOptions));
       } catch (err) {
         setError("Failed to fetch Pick Points. Please try again.");
       } finally {
@@ -59,6 +66,11 @@ const PickPointSelection = () => {
 
   const handlePickPointSelect = (pickPoint) => {
     setSelectedPickPoint(pickPoint);
+    const selectFiltersObject = {
+      ...selectedFilters,
+      "Current Location": pickPoint,
+    };
+    dispatch(setSelectedFilters(selectFiltersObject));
     dispatch(setPickPoint(pickPoint));
     setTimeout(() => {
       dispatch(setStep(3));
@@ -139,7 +151,9 @@ const PickPointSelection = () => {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 px-4 text-orange1">
         <PickPointIcon className="h-6 w-6" />
-        <p className="font-bold">Select Pick Point Location</p>
+        <p className="font-bold capitalize">
+          {contentData?.selectLocation || ""}
+        </p>
       </div>
       <hr color="#B3B8D6" />
       <div className="mx-4 space-y-3">

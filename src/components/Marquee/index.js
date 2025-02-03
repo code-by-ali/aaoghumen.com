@@ -14,6 +14,7 @@ import Temple12 from "../../assets/images/temple-12.jpg";
 import Temple13 from "../../assets/images/temple-13.jpg";
 import Temple14 from "../../assets/images/temple-14.jpg";
 import Temple15 from "../../assets/images/temple-15.jpg";
+import { useSelector } from "react-redux";
 
 const Marquee = () => {
   const templeImages1 = [
@@ -39,6 +40,7 @@ const Marquee = () => {
     { id: 9, src: Temple14 },
     { id: 10, src: Temple15 },
   ];
+  const { contentData } = useSelector((state) => state.content);
 
   return (
     <>
@@ -134,7 +136,7 @@ const Marquee = () => {
 
       <div className="text-center flex flex-col gap-3 mt-8 mb-4">
         <p className="text-black1 text-4xl font-extrabold">Welcome</p>
-        <p className="text-black1 text-base">"Plan Your Perfect Trip Today!"</p>
+        <p className="text-black1 text-base">"{contentData?.welcome || ""}"</p>
       </div>
     </>
   );

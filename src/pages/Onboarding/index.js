@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import apiService from "../../services/api/apiServices";
 import { setCategory } from "../../redux/onboarding/onboardingSlice";
 import { setCategoryList } from "../../redux/filter/filterSlice";
+import Spinner from "../../components/Spinner";
 
 const Onboarding = () => {
   const { step, city, language } = useSelector((state) => state.onboarding);
@@ -32,8 +33,11 @@ const Onboarding = () => {
       const response = await apiService.getCategories(body);
       const categories = response || [];
       const selectedCategory = categories.length ? categories[0] : {};
+      const transformedObject = Object.entries(categories)
+        .filter(([key]) => key !== "preDefineTripsCategory")
+        .map(([, value]) => value);
       dispatch(setCategory(selectedCategory));
-      dispatch(setCategoryList(categories));
+      dispatch(setCategoryList(transformedObject));
     } catch (err) {
       console.log("Failed to fetch Categories. Please try again.");
     } finally {
@@ -44,11 +48,21 @@ const Onboarding = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <Marquee />
-      {step === 1 && <CitySelection />}
-      {step === 2 && <PickPointSelection />}
-      {step === 3 && <LanguageSelection />}
-      {step === 4 && <TimeSelection />}
+      {loading ? (
+        <div className="h-screen flex items-center justify-center">
+          <Spinner />
+        </div>
+      ) : (
+        step !== 5 && (
+          <>
+            <Marquee />
+            {step === 1 && <CitySelection />}
+            {step === 2 && <PickPointSelection />}
+            {step === 3 && <LanguageSelection />}
+            {step === 4 && <TimeSelection />}
+          </>
+        )
+      )}
     </div>
   );
 };

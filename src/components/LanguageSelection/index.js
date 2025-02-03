@@ -5,9 +5,15 @@ import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
 import { setLanguage, setStep } from "../../redux/onboarding/onboardingSlice";
 import apiService from "../../services/api/apiServices";
 import Spinner from "../Spinner";
+import {
+  setLanguageList,
+  setSelectedFilters,
+} from "../../redux/filter/filterSlice";
 
 const LanguageSelection = () => {
   const { language } = useSelector((state) => state.onboarding);
+  const { contentData } = useSelector((state) => state.content);
+  const { selectedFilters } = useSelector((state) => state.filter);
   const [allLanguages, setAllLanguages] = useState([]); // Dynamic language list
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLanguage, setSelectedLanguage] = useState(language);
@@ -27,6 +33,7 @@ const LanguageSelection = () => {
         // Access the cityData array from the response
         const languages = response || [];
         setAllLanguages(languages);
+        dispatch(setLanguageList(languages));
       } catch (err) {
         setError("Failed to fetch Languages. Please try again.");
       } finally {
@@ -50,6 +57,11 @@ const LanguageSelection = () => {
   // Handle language selection
   const handleLanguageSelect = (language) => {
     setSelectedLanguage(language);
+    const selectFiltersObject = {
+      ...selectedFilters,
+      Languages: language,
+    };
+    dispatch(setSelectedFilters(selectFiltersObject));
     dispatch(setLanguage(language)); // Update Redux store
     setTimeout(() => {
       dispatch(setStep(4));
@@ -60,7 +72,9 @@ const LanguageSelection = () => {
     <div className="flex flex-col gap-3 transition-all duration-1000 ease-in-out">
       <div className="flex items-center gap-2 px-4 text-orange1">
         <LanguageIcon className="h-6 w-6" />
-        <p className="font-bold">Select Language</p>
+        <p className="font-bold capitalize">
+          {contentData?.selectLanguage || ""}
+        </p>
       </div>
       <hr color="#B3B8D6" />
       <div className="mx-4 space-y-3">

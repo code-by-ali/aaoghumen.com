@@ -58,6 +58,14 @@ const apiService = {
       throw error;
     }
   },
+  getStaticContent: async () => {
+    try {
+      const response = await api.get(endpoints.GET_STATIC_CONTENT);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default apiService;

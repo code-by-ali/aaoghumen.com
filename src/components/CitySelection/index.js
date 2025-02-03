@@ -9,6 +9,7 @@ import Spinner from "../Spinner";
 
 const CitySelection = () => {
   const { city } = useSelector((state) => state.onboarding);
+  const { contentData } = useSelector((state) => state.content);
   const [allCities, setAllCities] = useState([]); // Dynamic cities list
   const [searchQuery, setSearchQuery] = useState("");
   const [showAll, setShowAll] = useState(false);
@@ -60,7 +61,7 @@ const CitySelection = () => {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 px-4 text-orange1">
         <GlobeIconOrange />
-        <p className="font-bold">Select Current City</p>
+        <p className="font-bold capitalize">{contentData?.selectCity || ""}</p>
       </div>
       <hr color="#B3B8D6" />
       <div className="mx-4 space-y-3">

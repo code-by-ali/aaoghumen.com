@@ -5,9 +5,15 @@ import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
 import { setStep, setTime } from "../../redux/onboarding/onboardingSlice";
 import apiService from "../../services/api/apiServices";
 import Spinner from "../Spinner";
+import {
+  setHourList,
+  setSelectedFilters,
+} from "../../redux/filter/filterSlice";
 
 const TimeSelection = () => {
   const { time } = useSelector((state) => state.onboarding);
+  const { contentData } = useSelector((state) => state.content);
+  const { selectedFilters } = useSelector((state) => state.filter);
   const [allHours, setAllHours] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedHour, setSelectedHour] = useState(time);
@@ -25,6 +31,7 @@ const TimeSelection = () => {
         const response = await apiService.getHours();
         const hours = response || [];
         setAllHours(hours);
+        dispatch(setHourList(hours));
       } catch (err) {
         setError("Failed to fetch Hours. Please try again.");
       } finally {
@@ -44,6 +51,11 @@ const TimeSelection = () => {
 
   const handleHourSelect = (hour) => {
     setSelectedHour(hour);
+    const selectFiltersObject = {
+      ...selectedFilters,
+      "Traveling Time": hour,
+    };
+    dispatch(setSelectedFilters(selectFiltersObject));
     dispatch(setTime(hour));
     setTimeout(() => {
       dispatch(setStep(5));
@@ -54,7 +66,7 @@ const TimeSelection = () => {
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 px-4 text-orange1">
         <TimeIcon className="h-6 w-6" />
-        <p className="font-bold">Select Traveling Time</p>
+        <p className="font-bold capitalize">{contentData?.selectTime || ""}</p>
       </div>
       <hr color="#B3B8D6" />
       <div className="mx-4 space-y-3">

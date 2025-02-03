@@ -6,6 +6,10 @@ const tripSlice = createSlice({
     preTrips: [],
     planTrips: [],
     activeTab: "preTrip",
+    cart: {
+      selectedTrips: [],
+      selectedCategory: "",
+    },
   },
   reducers: {
     setActiveTab(state, action) {
@@ -17,8 +21,17 @@ const tripSlice = createSlice({
     setPlanTrips(state, action) {
       state.planTrips = action.payload;
     },
+    setPreTripCart(state, action) {
+      state.cart.selectedTrips = action.payload;
+      state.cart.selectedCategory = "preTrip";
+    },
+    setPlanTripCart(state, action) {
+      state.cart.selectedTrips = action.payload;
+      state.cart.selectedCategory = "planTrip";
+    },
   },
 });
 
-export const { setActiveTab, setPreTrips, setPlanTrips } = tripSlice.actions;
+export const { setActiveTab, setPreTrips, setPlanTrips, setCart } =
+  tripSlice.actions;
 export default tripSlice.reducer;

@@ -1,45 +1,47 @@
 import { DropdownMenu, ScrollArea } from "@radix-ui/themes";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { ReactComponent as DropdownIcon } from "../../assets/dropdown-icon.svg";
 import HeaderLogo from "../../assets/images/header-logo.png";
-import { setHourList } from "../../redux/filter/filterSlice";
 import { setTime } from "../../redux/onboarding/onboardingSlice";
-import apiService from "../../services/api/apiServices";
+import { setSelectedFilters } from "../../redux/filter/filterSlice";
 
 const Header = () => {
   const dispatch = useDispatch();
-  const { city, time } = useSelector((state) => state.onboarding);
+  const { city, step } = useSelector((state) => state.onboarding);
+  const { selectedFilters } = useSelector((state) => state.filter);
   const { hours } = useSelector((state) => state.filter);
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetchHours();
+    if (step !== 5) {
+      navigate("/");
+      return;
+    }
   }, []);
 
   const handleTimeSelect = (selectedTime) => {
     dispatch(setTime(selectedTime));
-  };
-
-  const fetchHours = async () => {
-    try {
-      const response = await apiService.getHours();
-      const hours = response || [];
-      dispatch(setHourList(hours));
-    } catch (err) {
-      console.log("Failed to fetch Hours. Please try again.");
-    }
+    const selectFiltersObject = {
+      ...selectedFilters,
+      "Traveling Time": selectedTime,
+    };
+    dispatch(setSelectedFilters(selectFiltersObject));
+    setIsOpen(false); // Close the dropdown after selection
   };
 
   return (
     <>
       <div className="flex justify-between items-center px-4 py-3">
         <img src={HeaderLogo} className="" alt="" />
-        <DropdownMenu.Root>
+        <DropdownMenu.Root open={isOpen} onOpenChange={setIsOpen}>
           <DropdownMenu.Trigger>
             <span className="flex cursor-pointer items-center gap-1.5 text-black1 font-semibold text-[15px]">
               {city?.cityName}
               <div className="w-1 h-1 bg-black rounded-full"></div>
-              {time?.name}
+              {selectedFilters["Traveling Time"]?.name}
               <DropdownIcon className="ml-1 h-3 w-3" />
             </span>
           </DropdownMenu.Trigger>
@@ -56,7 +58,7 @@ const Header = () => {
                     key={timeSlot.code}
                     onClick={() => handleTimeSelect(timeSlot)}
                     className={`px-2 py-1.5 font-medium text-sm cursor-pointer hover:bg-[#FFF5f1] ${
-                      time?.code === timeSlot.code
+                      selectedFilters["Traveling Time"]?.code === timeSlot.code
                         ? "bg-[#FFF5F1] text-orange1"
                         : ""
                     }`}
