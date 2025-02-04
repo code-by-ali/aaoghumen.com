@@ -140,7 +140,7 @@ const FilterButton = () => {
   return (
     <>
       <div
-        className="absolute bottom-16 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
+        className="absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
         onClick={toggleDrawer(true)}
       >
         <FilterIcon className="h-5 w-5" />
