@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useSelector } from "react-redux";
-import { Global } from "@emotion/react";
 import { styled } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Slider from "react-slick";
 import FallbackImage from "../../assets/images/fallback-slider-image.png";
+import { ReactComponent as PlusIconBlack } from "../../assets/plus-icon-black.svg";
 import { ReactComponent as StarIcon } from "../../assets/star-icon.svg";
 import { ReactComponent as TiltedArrowIcon } from "../../assets/tilted-arrow-icon.svg";
-import { ReactComponent as PlusIconBlack } from "../../assets/plus-icon-black.svg";
-
+import { ReactComponent as CartIcon } from "../../assets/cart-icon.svg";
+import { setEmptyCart, setPreTripCart } from "../../redux/trip/tripSlice";
+import { Plus, ShoppingCart } from "lucide-react";
 import CustomAudioPlayer from "../CustomAudioPlayer";
 import FilterButton from "../FilterButton";
+import { useNavigate } from "react-router-dom";
+import { CustomModal } from "../CustomModal.js";
 
 const drawerBleeding = 56;
 
@@ -72,9 +74,13 @@ const TruncatedDescription = ({ description, open, maxLength = 100 }) => {
 };
 
 const PreTrip = () => {
-  const { preTrips } = useSelector((state) => state.trip);
+  const { preTrips, cart } = useSelector((state) => state.trip);
   const [activeIndex, setActiveIndex] = useState(0);
   const [open, setOpen] = useState(false);
+  const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { selectedTrips, selectedCategory } = cart;
 
   const settings = useMemo(
     () => ({
@@ -96,9 +102,31 @@ const PreTrip = () => {
 
   const currentTrip = preTrips[activeIndex] || {};
 
+  function handleAddTrip(trip) {
+    if (selectedCategory === "planTrip" && selectedTrips.length) {
+      setIsAddTripDialogOpen(true);
+    } else {
+      dispatch(setPreTripCart([trip]));
+      navigate("/cart");
+    }
+  }
+
   return (
     <>
       <FilterButton />
+      <CustomModal
+        open={isAddTripDialogOpen}
+        onClose={() => setIsAddTripDialogOpen(false)}
+        title="Want to Add this Trip ?"
+        description="Note: You have already added a trip in the cart from Plan you Trip Tab which will be lost by adding this trip. Are you sure you want to add this trip?"
+        primaryButtonText="Yes, Proceed"
+        primaryButtonColor="primary"
+        onPrimaryAction={() => {
+          dispatch(setEmptyCart());
+          dispatch(setPreTripCart([currentTrip]));
+          navigate("/cart");
+        }}
+      />
       <Root>
         <div className="slider-container">
           <Slider {...settings}>
@@ -133,6 +161,25 @@ const PreTrip = () => {
               </div>
             ))}
           </Slider>
+          <div className="w-full inline-flex justify-center mt-2">
+            {cart.selectedCategory === "preTrip" &&
+            cart.selectedTrips.length > 0 ? (
+              <button
+                className="text-white inline-flex gap-2 px-2.5 py-1.5 justify-center items-center bg-orange1 rounded-md font-semibold text-[15px]"
+                onClick={() => navigate("/cart")}
+              >
+                <CartIcon className="h-5 w-5 stroke-[3px]" /> View Cart
+                <TiltedArrowIcon className="h-2.5 w-2.5" />
+              </button>
+            ) : (
+              <button
+                className="text-white inline-flex gap-2 px-2.5 py-1.5 justify-center items-center bg-orange1 rounded-md font-semibold text-[15px]"
+                onClick={() => handleAddTrip(currentTrip)}
+              >
+                <Plus className="h-5 w-5 stroke-[3px]" /> Add to Cart
+              </button>
+            )}
+          </div>
         </div>
         <SwipeableDrawer
           anchor="bottom"
@@ -145,46 +192,48 @@ const PreTrip = () => {
             keepMounted: true,
           }}
         >
-          <StyledBox
-            sx={{
-              position: "absolute",
-              top: -drawerBleeding,
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
-              visibility: "visible",
-              right: 0,
-              left: 0,
-              maxWidth: "430px",
-              margin: "auto",
-              fontFamily: "Public Sans, serif",
-            }}
-            className="border-t-2"
-          >
-            {open && (
-              <div
-                className="absolute cursor-pointer bg-white flex items-center justify-center h-9 w-9 rounded-full"
-                onClick={() => setOpen(false)}
-                style={{ top: "-48px", left: "calc(50% - 17px)" }}
-              >
-                <PlusIconBlack className="rotate-45" />
-              </div>
-            )}
-            <Puller />
-            <div className="h-full" onClick={() => setOpen(true)}>
-              <div className="flex mt-[17px] px-3 gap-2 justify-between items-center">
-                <span className="font-bold text-black1 text-[19px] tracking-wide">
-                  {currentTrip.tripName}
-                </span>
-                <span
-                  className=" bg-[#FFB61A] text-white 
-                text-[14px] font-medium w-[46px] flex items-center justify-center py-0.5 rounded-md"
+          <div className="trip-content">
+            <StyledBox
+              sx={{
+                position: "absolute",
+                top: -drawerBleeding,
+                borderTopLeftRadius: 0,
+                borderTopRightRadius: 0,
+                visibility: "visible",
+                right: 0,
+                left: 0,
+                maxWidth: "430px",
+                margin: "auto",
+                fontFamily: "Public Sans, serif",
+              }}
+              className="border-t-2"
+            >
+              {open && (
+                <div
+                  className="absolute cursor-pointer bg-white flex items-center justify-center h-9 w-9 rounded-full"
+                  onClick={() => setOpen(false)}
+                  style={{ top: "-48px", left: "calc(50% - 17px)" }}
                 >
-                  <StarIcon className="mr-1.5" /> {currentTrip.tripRating}
-                </span>
+                  <PlusIconBlack className="rotate-45" />
+                </div>
+              )}
+              <Puller />
+              <div className="h-full" onClick={() => setOpen(true)}>
+                <div className="flex mt-[17px] px-3 gap-2 justify-between items-center">
+                  <span className="font-bold text-black1 text-[19px] tracking-wide">
+                    {currentTrip.tripName}
+                  </span>
+                  <span
+                    className=" bg-[#FFB61A] text-white 
+                text-[14px] font-medium w-[46px] flex items-center justify-center py-0.5 rounded-md"
+                  >
+                    <StarIcon className="mr-1.5" /> {currentTrip.tripRating}
+                  </span>
+                </div>
+                <p className="m-[9px]"></p>
               </div>
-              <p className="m-[9px]"></p>
-            </div>
-          </StyledBox>
+            </StyledBox>
+          </div>
           <StyledBox
             sx={{
               height: "100%",

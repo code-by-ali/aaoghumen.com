@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   BrowserRouter,
   Routes as MainRoutes,
@@ -6,11 +7,13 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import SplashScreen from "./pages/SplashScreen";
-import Onboarding from "./pages/Onboarding";
-import Home from "./pages/Home";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
-import { useSelector } from "react-redux";
+import Cart from "./pages/Cart";
+import Home from "./pages/Home";
+import Onboarding from "./pages/Onboarding";
+import SplashScreen from "./pages/SplashScreen";
 
 const Routes = () => {
   const location = useLocation();
@@ -25,6 +28,18 @@ const Routes = () => {
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={true}
+        newestOnTop={true}
+        closeOnClick={true}
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
       <div className="min-h-screen bg-gray-200">
         <div
           className="relative mx-auto bg-white min-h-screen flex flex-col"
@@ -35,6 +50,7 @@ const Routes = () => {
             <Route path="/" element={<SplashScreen />} />
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/home" element={<Home />} />
+            <Route path="/cart" element={<Cart />} />
           </MainRoutes>
         </div>
       </div>

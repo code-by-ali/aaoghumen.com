@@ -37,6 +37,8 @@ const FilterButton = () => {
     (state) => state.onboarding
   );
 
+  const { contentData } = useSelector((state) => state.content);
+
   const [open, setOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState("Places");
   const [selectedFilters, setSelectedFiltersLocal] = useState({
@@ -140,7 +142,7 @@ const FilterButton = () => {
   return (
     <>
       <div
-        className="absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
+        className="filter-button absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
         onClick={toggleDrawer(true)}
       >
         <FilterIcon className="h-5 w-5" />
@@ -171,7 +173,8 @@ const FilterButton = () => {
 
           <div className="text-orange1 px-3.5 py-1 w-full border-b border-[#B3B8D6]">
             <span className="capitalize font-bold inline-flex items-center gap-1.5">
-              <Filter className="stroke-orange1 h-5 w-5" /> Filter
+              <Filter className="stroke-orange1 h-5 w-5" />{" "}
+              {contentData?.filter || ""}
             </span>
           </div>
 

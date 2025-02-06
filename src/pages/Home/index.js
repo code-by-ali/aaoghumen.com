@@ -11,6 +11,7 @@ import PlanTrip from "../../components/PlanTrip";
 import Spinner from "../../components/Spinner";
 import { getHours } from "date-fns";
 import FilterButton from "../../components/FilterButton";
+import TourGuide from "../../components/TourGuide";
 
 const Home = () => {
   const { activeTab } = useSelector((state) => state.trip);
@@ -90,6 +91,7 @@ const Home = () => {
 
   return (
     <div>
+      <TourGuide />
       <div className="flex px-3 py-4 capitalize">
         <button
           onClick={() => dispatch(setActiveTab("preTrip"))}
@@ -103,7 +105,7 @@ const Home = () => {
         </button>
         <button
           onClick={() => dispatch(setActiveTab("planTrip"))}
-          className={`flex-1 py-1.5 text-center text-[15px] font-semibold ${
+          className={`plan-trip-tab flex-1 py-1.5 text-center text-[15px] font-semibold ${
             activeTab === "planTrip"
               ? "bg-orange1 text-white rounded-md"
               : "text-black1"
