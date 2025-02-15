@@ -66,6 +66,38 @@ const apiService = {
       throw error;
     }
   },
+  getMobileOtp: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_MOBILE_OTP, body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getResendOtp: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_RESEND_OTP, body);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+  cashFreeCreateOrder: async (body) => {
+    try {
+      const response = await api.post(endpoints.CASH_FREE_CREATE_ORDER, body);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+  getGeneratedTrip: async (body) => {
+    try {
+      const response = await api.post(endpoints.GET_GENERATED_TRIP, body);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default apiService;

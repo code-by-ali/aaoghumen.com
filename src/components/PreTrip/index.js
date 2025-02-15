@@ -39,7 +39,11 @@ const Puller = styled("div")(({ theme }) => ({
 }));
 
 // Custom component for truncated description
-const TruncatedDescription = ({ description, open, maxLength = 100 }) => {
+export const TruncatedDescription = ({
+  description,
+  open,
+  maxLength = 100,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Reset expanded state when drawer closes

@@ -18,6 +18,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import {
   setActiveTab,
+  setDropLocation,
   setEmptyCart,
   setTripRemove,
 } from "../../redux/trip/tripSlice";
@@ -73,6 +74,7 @@ const Cart = () => {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isBackDialogOpen, setIsBackDialogOpen] = useState(false);
   const [confirmBack, setConfirmBack] = useState(false);
+  const [amount, setAmount] = useState(300);
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -98,6 +100,10 @@ const Cart = () => {
     }
   }, [confirmBack, dispatch, navigate]);
 
+  useEffect(() => {
+    dispatch(setDropLocation(selectedDrop.code))
+  }, [selectedDrop])
+
   const handleDropChange = (event) => {
     // Find the complete location object that matches the selected code
     const selectedLocation = dropLocations.find(
@@ -108,9 +114,19 @@ const Cart = () => {
 
   const handleRemoveAll = (redirectTab) => {
     dispatch(setEmptyCart());
+    dispatch(setDropLocation(''))
     dispatch(setActiveTab(redirectTab));
     navigate("/home");
   };
+
+  function redirectToMobilePage() {
+    const mobile = localStorage.getItem("verified-mobile");
+    if (mobile) {
+      navigate("/payment", { state: { amount } });
+    } else {
+      navigate("/enter-mobile", { state: { amount } });
+    }
+  }
 
   return (
     <>
@@ -221,7 +237,13 @@ const Cart = () => {
                       aria-label="delete"
                       color="error"
                       size="small"
-                      onClick={() => dispatch(setTripRemove(trip.code))}
+                      onClick={() => {
+                        dispatch(setTripRemove(trip.code))
+                        if(selectedDrop.code === trip.code) {
+                          setSelectedDrop(dropLocations[0])
+
+                        }
+                      }}
                     >
                       <Trash2 className="h-5 w-5" />
                     </IconButton>
@@ -321,10 +343,13 @@ const Cart = () => {
           </div>
           <div className="px-4 py-4 bg-black1 text-white flex justify-between items-center">
             <div>
-              Total: <strong>₹300</strong>
+              Total: <strong>₹{amount}</strong>
               <p className="font-light text-sm">Per person</p>
             </div>
-            <button className="bg-orange1 rounded-lg font-medium px-3.5 py-2 text-sm">
+            <button
+              className="bg-orange1 rounded-lg font-medium px-3.5 py-2 text-sm"
+              onClick={redirectToMobilePage}
+            >
               Generate Trip
             </button>
           </div>

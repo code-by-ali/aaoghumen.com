@@ -2,7 +2,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://aaoghumen.com/dev3/api/v1",
-  timeout: 10000,
+  // timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },

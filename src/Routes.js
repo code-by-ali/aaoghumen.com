@@ -14,10 +14,23 @@ import Cart from "./pages/Cart";
 import Home from "./pages/Home";
 import Onboarding from "./pages/Onboarding";
 import SplashScreen from "./pages/SplashScreen";
+import MobileNumberInput from "./pages/MobileNumberInput";
+import VerificationCodeInput from "./pages/VerificationCodeInput";
+import PaymentPage from "./pages/PaymentPage";
+import Success from "./pages/PaymentPage/Success";
+import Failed from "./pages/PaymentPage/Failed";
+import TripGenerate from "./pages/TripGenerate";
+import Status from "./pages/PaymentPage/Status";
 
 const Routes = () => {
   const location = useLocation();
-  const excludedPaths = ["/", "/onboarding"];
+  const excludedPaths = [
+    "/",
+    "/onboarding",
+    "/payment",
+    "/payment-success",
+    "/payment-failed",
+  ];
   const onboarding = useSelector((state) => state.onboarding);
   const navigate = useNavigate();
   useEffect(() => {
@@ -51,6 +64,13 @@ const Routes = () => {
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/home" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
+            <Route path="/enter-mobile" element={<MobileNumberInput />} />
+            <Route path="/verify-code" element={<VerificationCodeInput />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/payment-success" element={<Success />} />
+            <Route path="/payment-failed" element={<Failed />} />
+            <Route path="/trip-generate" element={<TripGenerate />} />
+            <Route path="/payment-status" element={<Status />} />
           </MainRoutes>
         </div>
       </div>

@@ -14,6 +14,7 @@ const Header = () => {
   const { hours } = useSelector((state) => state.filter);
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const urlsToIgnore = ["/cart", "/enter-mobile", "/trip-generate"];
 
   useEffect(() => {
     if (step !== 5) {
@@ -42,7 +43,7 @@ const Header = () => {
           onClick={() => navigate("/home")}
         />
 
-        {window.location.pathname === "/cart" ? (
+        {urlsToIgnore.includes(window.location.pathname) ? (
           <span className="flex cursor-pointer items-center gap-1.5 text-black1 font-semibold text-[15px]">
             {city?.cityName}
           </span>

@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import FilterButton from "../../components/FilterButton";
+import PlanTrip from "../../components/PlanTrip";
+import PreTrip from "../../components/PreTrip";
+import Spinner from "../../components/Spinner";
+import TourGuide from "../../components/TourGuide";
 import {
   setActiveTab,
   setPlanTrips,
   setPreTrips,
 } from "../../redux/trip/tripSlice";
 import apiService from "../../services/api/apiServices";
-import PreTrip from "../../components/PreTrip";
-import PlanTrip from "../../components/PlanTrip";
-import Spinner from "../../components/Spinner";
-import { getHours } from "date-fns";
-import FilterButton from "../../components/FilterButton";
-import TourGuide from "../../components/TourGuide";
 
 const Home = () => {
   const { activeTab } = useSelector((state) => state.trip);
@@ -37,10 +36,10 @@ const Home = () => {
     };
     const planTripBody = {
       cityName: city.cityName,
-      category: "Temples",
-      // selectedFilters.Places.length
-      //   ? selectedFilters.Places.map((obj) => obj.code)?.join(",")
-      //   : defaultPlaces,
+      // category: "Temples",
+      category: selectedFilters.Places.length
+        ? selectedFilters.Places.map((obj) => obj.code)?.join(",")
+        : defaultPlaces,
       language: selectedFilters.Languages.code,
     };
     setLoading(true);
