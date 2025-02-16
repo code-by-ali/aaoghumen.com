@@ -12,6 +12,8 @@ import apiService from "../../services/api/apiServices";
 import { CircleX } from "lucide-react";
 import { format, parse } from "date-fns";
 import { TruncatedDescription } from "../../components/PreTrip";
+import Spinner from '../../components/Spinner'
+import { LoaderCircle } from "lucide-react";
 
 const TripGenerate = () => {
   const dispatch = useDispatch();
@@ -98,6 +100,17 @@ const TripGenerate = () => {
 
   return (
     <div className="h-[calc(100vh-58px)] overflow-auto relative">
+      {
+        loading ? <div className="h-full w-full flex justify-center items-center">
+          <LoaderCircle
+        className="animate-spin ml-1.5 mt-[1px]"
+        size={50}
+        color={"#ED5722"}
+        strokeWidth={3}
+      />
+          </div>
+            :
+      <>
       <iframe
         srcDoc={data.map}
         className="h-full w-full border-none"
@@ -175,7 +188,7 @@ const TripGenerate = () => {
             />
           </div>
           <div className="px-4">
-            {data.locationDetails.map((obj, idx) => (
+            {Object.keys(data).length && data?.locationDetails?.map((obj, idx) => (
               <div className="pl-2 flex items-start gap-6 relative">
                 <div className="absolute top-0 bottom-0 bg-[#518EFF] max-w-5 w-5 bg-opacity-10">
                   <div className="flex flex-col items-center mt-2 relative">
@@ -213,6 +226,8 @@ const TripGenerate = () => {
           </div>
         </Box>
       </SwipeableDrawer>
+      </>
+      }
     </div>
   );
 };
