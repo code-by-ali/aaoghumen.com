@@ -14,6 +14,7 @@ import CustomAudioPlayer from "../CustomAudioPlayer";
 import FilterButton from "../FilterButton";
 import { useNavigate } from "react-router-dom";
 import { CustomModal } from "../CustomModal.js";
+import PhotoGallery from "../PhotoGallery/index.js";
 
 const drawerBleeding = 56;
 
@@ -78,7 +79,8 @@ export const TruncatedDescription = ({
 };
 
 const PreTrip = () => {
-  const { preTrips, cart } = useSelector((state) => state.trip);
+  const { preTrips, cart, generatedTrip } = useSelector((state) => state.trip);
+  const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
@@ -117,7 +119,7 @@ const PreTrip = () => {
 
   return (
     <>
-      <FilterButton />
+      <FilterButton hidePlaces={true} />
       <CustomModal
         open={isAddTripDialogOpen}
         onClose={() => setIsAddTripDialogOpen(false)}
@@ -173,6 +175,15 @@ const PreTrip = () => {
                 onClick={() => navigate("/cart")}
               >
                 <CartIcon className="h-5 w-5 stroke-[3px]" /> View Cart
+                <TiltedArrowIcon className="h-2.5 w-2.5" />
+              </button>
+            ) : Object.keys(data).length > 0 ? (
+              <button
+                className="text-white inline-flex gap-2 px-2.5 py-1.5 justify-center items-center bg-orange1 rounded-md font-semibold text-[15px]"
+                onClick={() => navigate("/trip-generate")}
+              >
+                <CartIcon className="h-5 w-5 stroke-[3px]" /> View Generated
+                Trip
                 <TiltedArrowIcon className="h-2.5 w-2.5" />
               </button>
             ) : (

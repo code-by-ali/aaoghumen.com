@@ -24,7 +24,7 @@ const DrawerPaper = styled("div")({
   overflow: "hidden",
 });
 
-const FilterButton = () => {
+const FilterButton = ({ hidePlaces = false }) => {
   const dispatch = useDispatch();
   const {
     categories,
@@ -40,7 +40,9 @@ const FilterButton = () => {
   const { contentData } = useSelector((state) => state.content);
 
   const [open, setOpen] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("Places");
+  const [selectedTab, setSelectedTab] = useState(
+    hidePlaces ? "Languages" : "Places"
+  );
   const [selectedFilters, setSelectedFiltersLocal] = useState({
     Places: [],
     Languages: null,
@@ -50,10 +52,25 @@ const FilterButton = () => {
   const [isApplyEnabled, setIsApplyEnabled] = useState(false);
 
   const tabs = [
-    { name: "Places", type: "checkbox", tabContent: categories },
-    { name: "Languages", type: "radio", tabContent: languages },
-    { name: "Traveling Time", type: "radio", tabContent: hours },
-    { name: "Current Location", type: "radio", tabContent: pickPoints },
+    {
+      name: "Places",
+      type: "checkbox",
+      tabContent: categories,
+      hide: hidePlaces,
+    },
+    {
+      name: "Languages",
+      type: "radio",
+      tabContent: languages,
+      hide: false,
+    },
+    { name: "Traveling Time", type: "radio", tabContent: hours, hide: false },
+    {
+      name: "Current Location",
+      type: "radio",
+      tabContent: pickPoints,
+      hide: false,
+    },
   ];
 
   useEffect(() => {
@@ -142,7 +159,7 @@ const FilterButton = () => {
   return (
     <>
       <div
-        className="filter-button absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
+        className="filter-button z-[9999] absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
         onClick={toggleDrawer(true)}
       >
         <FilterIcon className="h-5 w-5" />
@@ -186,100 +203,110 @@ const FilterButton = () => {
               className="flex w-full"
             >
               <Tabs.List className="flex flex-col border-r border-[#B3B8D6] w-[150px]">
-                {tabs.map((tab) => (
-                  <Tabs.Trigger
-                    key={tab.name}
-                    value={tab.name}
-                    className={`text-left cursor-pointer p-2.5 w-full font-medium text-sm tracking-wide ${
-                      tab.name === selectedTab
-                        ? "text-orange1 bg-[#E9EDEF] bg-opacity-50 border-l-2 border-orange1"
-                        : "text-black1"
-                    }`}
-                  >
-                    {tab.name}
-                  </Tabs.Trigger>
-                ))}
+                {tabs.map(
+                  (tab) =>
+                    !tab.hide && (
+                      <Tabs.Trigger
+                        key={tab.name}
+                        value={tab.name}
+                        className={`text-left cursor-pointer p-2.5 w-full font-medium text-sm tracking-wide ${
+                          tab.name === selectedTab
+                            ? "text-orange1 bg-[#E9EDEF] bg-opacity-50 border-l-2 border-orange1"
+                            : "text-black1"
+                        }`}
+                      >
+                        {tab.name}
+                      </Tabs.Trigger>
+                    )
+                )}
               </Tabs.List>
 
               <div className="flex-1 px-4 py-2 overflow-y-auto">
-                {tabs.map((tab) => (
-                  <Tabs.Content key={tab.name} value={tab.name}>
-                    <div className="flex flex-col">
-                      {tab.type === "checkbox" ? (
-                        tab.tabContent.map((option) => {
-                          const isChecked = selectedFilters[tab.name]?.some(
-                            (item) => item.code === option.code
-                          );
+                {tabs.map(
+                  (tab) =>
+                    !tab.hide && (
+                      <Tabs.Content key={tab.name} value={tab.name}>
+                        <div className="flex flex-col">
+                          {tab.type === "checkbox" ? (
+                            tab.tabContent.map((option) => {
+                              const isChecked = selectedFilters[tab.name]?.some(
+                                (item) => item.code === option.code
+                              );
 
-                          return (
-                            <FormControlLabel
-                              key={option.code}
-                              control={
-                                <Checkbox
-                                  checked={isChecked}
-                                  onChange={() =>
-                                    handleCheckboxChange(tab.name, option)
+                              return (
+                                <FormControlLabel
+                                  key={option.code}
+                                  control={
+                                    <Checkbox
+                                      checked={isChecked}
+                                      onChange={() =>
+                                        handleCheckboxChange(tab.name, option)
+                                      }
+                                      color="primary"
+                                      sx={{
+                                        padding: "6px",
+                                        "& .MuiSvgIcon-root": {
+                                          fontSize: "20px",
+                                        },
+                                        "&.Mui-checked": { color: "#ED5722" },
+                                      }}
+                                    />
                                   }
-                                  color="primary"
+                                  label={option.name}
                                   sx={{
-                                    padding: "6px",
-                                    "& .MuiSvgIcon-root": { fontSize: "20px" },
-                                    "&.Mui-checked": { color: "#ED5722" },
+                                    "& .MuiTypography-root": {
+                                      fontFamily:
+                                        "Public Sans, sans-serif !important",
+                                      fontSize: "14px",
+                                      color: "#182138",
+                                    },
                                   }}
                                 />
-                              }
-                              label={option.name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontFamily:
-                                    "Public Sans, sans-serif !important",
-                                  fontSize: "14px",
-                                  color: "#182138",
-                                },
+                              );
+                            })
+                          ) : (
+                            <RadioGroup
+                              value={selectedFilters[tab.name]?.code || ""}
+                              onChange={(e) => {
+                                const selectedOption = tab.tabContent.find(
+                                  (item) => item.code == e.target.value
+                                );
+                                handleRadioChange(tab.name, selectedOption);
                               }}
-                            />
-                          );
-                        })
-                      ) : (
-                        <RadioGroup
-                          value={selectedFilters[tab.name]?.code || ""}
-                          onChange={(e) => {
-                            const selectedOption = tab.tabContent.find(
-                              (item) => item.code == e.target.value
-                            );
-                            handleRadioChange(tab.name, selectedOption);
-                          }}
-                        >
-                          {tab.tabContent.map((option) => (
-                            <FormControlLabel
-                              key={option.code}
-                              value={option.code}
-                              control={
-                                <Radio
-                                  color="primary"
+                            >
+                              {tab.tabContent.map((option) => (
+                                <FormControlLabel
+                                  key={option.code}
+                                  value={option.code}
+                                  control={
+                                    <Radio
+                                      color="primary"
+                                      sx={{
+                                        padding: "6px",
+                                        "& .MuiSvgIcon-root": {
+                                          fontSize: "20px",
+                                        },
+                                        "&.Mui-checked": { color: "#ED5722" },
+                                      }}
+                                    />
+                                  }
+                                  label={option.name}
                                   sx={{
-                                    padding: "6px",
-                                    "& .MuiSvgIcon-root": { fontSize: "20px" },
-                                    "&.Mui-checked": { color: "#ED5722" },
+                                    "& .MuiTypography-root": {
+                                      fontFamily:
+                                        "Public Sans, sans-serif !important",
+                                      fontSize: "14px",
+                                      color: "#182138",
+                                    },
                                   }}
                                 />
-                              }
-                              label={option.name}
-                              sx={{
-                                "& .MuiTypography-root": {
-                                  fontFamily:
-                                    "Public Sans, sans-serif !important",
-                                  fontSize: "14px",
-                                  color: "#182138",
-                                },
-                              }}
-                            />
-                          ))}
-                        </RadioGroup>
-                      )}
-                    </div>
-                  </Tabs.Content>
-                ))}
+                              ))}
+                            </RadioGroup>
+                          )}
+                        </div>
+                      </Tabs.Content>
+                    )
+                )}
               </div>
             </Tabs.Root>
           </div>

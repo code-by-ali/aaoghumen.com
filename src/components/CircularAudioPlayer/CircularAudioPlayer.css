@@ -1,0 +1,37 @@
+/* Hide all default controls */
+/* .custom-audio-player .rhap_main-controls, */
+.custom-audio-player .rhap_progress-section,
+.custom-audio-player .rhap_volume-controls,
+.custom-audio-player .rhap_additional-controls {
+  display: none;
+}
+
+.circular-player.white {
+  width: 40px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white !important;
+}
+
+.circular-player.orange {
+  width: 40px;
+  border-radius: 50% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ed5722 !important;
+}
+.circular-player.white .rhap_main-controls-button {
+  color: black;
+}
+
+.circular-player.orange .rhap_main-controls-button {
+  color: white;
+}
+
+.rhap_play-pause-button {
+  width: 26px;
+  height: 38px;
+}

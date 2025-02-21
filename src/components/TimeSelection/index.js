@@ -9,9 +9,10 @@ import {
   setHourList,
   setSelectedFilters,
 } from "../../redux/filter/filterSlice";
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 
 const TimeSelection = () => {
-  const { time } = useSelector((state) => state.onboarding);
+  const { time, step } = useSelector((state) => state.onboarding);
   const { contentData } = useSelector((state) => state.content);
   const { selectedFilters } = useSelector((state) => state.filter);
   const [allHours, setAllHours] = useState([]);
@@ -65,6 +66,10 @@ const TimeSelection = () => {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 px-4 text-orange1">
+        <ArrowLeft
+          className="text-gray-500"
+          onClick={() => dispatch(setStep(step - 1))}
+        />
         <TimeIcon className="h-6 w-6" />
         <p className="font-bold capitalize">{contentData?.selectTime || ""}</p>
       </div>
@@ -81,7 +86,16 @@ const TimeSelection = () => {
         </div>
 
         {/* Display loading state */}
-        {loading && <Spinner message="Loading, please wait..." />}
+        {loading && (
+          <div className="h-full w-full flex justify-center items-center">
+            <LoaderCircle
+              className="animate-spin ml-1.5 mt-[1px]"
+              size={30}
+              color={"#ED5722"}
+              strokeWidth={3}
+            />
+          </div>
+        )}
 
         {/* Display error state */}
         {error && <p className="text-center text-red-500">{error}</p>}

@@ -1,21 +1,17 @@
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ReactComponent as PickPointIcon } from "../../assets/pick-point-icon.svg";
 import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
 import {
-  setPickPoint,
-  setStep,
-  setTime,
-} from "../../redux/onboarding/onboardingSlice";
-import apiService from "../../services/api/apiServices";
-import Spinner from "../Spinner";
-import {
   setPickPointList,
   setSelectedFilters,
 } from "../../redux/filter/filterSlice";
+import { setPickPoint, setStep } from "../../redux/onboarding/onboardingSlice";
+import apiService from "../../services/api/apiServices";
 
 const PickPointSelection = () => {
-  const { pickPoint, city } = useSelector((state) => state.onboarding);
+  const { pickPoint, city, step } = useSelector((state) => state.onboarding);
   const { contentData } = useSelector((state) => state.content);
   const { selectedFilters } = useSelector((state) => state.filter);
   const [allPickPoint, setAllPickPoint] = useState([]);
@@ -79,7 +75,16 @@ const PickPointSelection = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <Spinner message="Loading, please wait..." />;
+      return (
+        <div className="h-full w-full flex justify-center items-center">
+          <LoaderCircle
+            className="animate-spin ml-1.5 mt-[1px]"
+            size={30}
+            color={"#ED5722"}
+            strokeWidth={3}
+          />
+        </div>
+      );
     }
 
     if (error) {
@@ -150,6 +155,10 @@ const PickPointSelection = () => {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2 px-4 text-orange1">
+        <ArrowLeft
+          className="text-gray-500"
+          onClick={() => dispatch(setStep(step - 1))}
+        />
         <PickPointIcon className="h-6 w-6" />
         <p className="font-bold capitalize">
           {contentData?.selectLocation || ""}

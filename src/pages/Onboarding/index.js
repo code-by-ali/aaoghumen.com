@@ -1,15 +1,15 @@
+import { LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import CitySelection from "../../components/CitySelection";
-import Marquee from "../../components/Marquee";
 import { useDispatch, useSelector } from "react-redux";
-import LanguageSelection from "../../components/LanguageSelection";
-import TimeSelection from "../../components/TimeSelection";
-import PickPointSelection from "../../components/PickPointSelection";
 import { useNavigate } from "react-router-dom";
-import apiService from "../../services/api/apiServices";
-import { setCategory } from "../../redux/onboarding/onboardingSlice";
+import CitySelection from "../../components/CitySelection";
+import LanguageSelection from "../../components/LanguageSelection";
+import Marquee from "../../components/Marquee";
+import PickPointSelection from "../../components/PickPointSelection";
+import TimeSelection from "../../components/TimeSelection";
 import { setCategoryList } from "../../redux/filter/filterSlice";
-import Spinner from "../../components/Spinner";
+import { setCategory } from "../../redux/onboarding/onboardingSlice";
+import apiService from "../../services/api/apiServices";
 
 const Onboarding = () => {
   const { step, city, language } = useSelector((state) => state.onboarding);
@@ -50,7 +50,12 @@ const Onboarding = () => {
     <div className="flex flex-col w-full">
       {loading ? (
         <div className="h-screen flex items-center justify-center">
-          <Spinner />
+          <LoaderCircle
+            className="animate-spin ml-1.5 mt-[1px]"
+            size={40}
+            color={"#ED5722"}
+            strokeWidth={3}
+          />
         </div>
       ) : (
         step !== 5 && (

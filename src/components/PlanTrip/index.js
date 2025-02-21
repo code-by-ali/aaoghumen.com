@@ -10,9 +10,13 @@ import { ReactComponent as PlusIcon } from "../../assets/plus-icon-black.svg";
 import { ReactComponent as CarIcon } from "../../assets/car-icon.svg";
 import { ReactComponent as ClockIcon } from "../../assets/clock-icon.svg";
 import CustomAudioPlayer from "../CustomAudioPlayer";
-import { Check, Plus } from "lucide-react";
+import { Check, Minus, Plus } from "lucide-react";
 import FilterButton from "../FilterButton";
-import { setEmptyCart, setPlanTripCart } from "../../redux/trip/tripSlice";
+import {
+  setEmptyCart,
+  setPlanTripCart,
+  setTripRemove,
+} from "../../redux/trip/tripSlice";
 import { useNavigate } from "react-router-dom";
 import { se } from "date-fns/locale";
 import { toast } from "react-toastify";
@@ -21,7 +25,8 @@ import { CustomModal } from "../CustomModal.js";
 const PlanTrip = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { planTrips, cart } = useSelector((state) => state.trip);
+  const { planTrips, cart, generatedTrip } = useSelector((state) => state.trip);
+  const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
   const [open, setOpen] = useState(false);
@@ -113,21 +118,44 @@ const PlanTrip = () => {
               );
             })}
           </Slider>
-          <div className="flex w-full py-2 gap-2 justify-center">
-            {selectedTrips.length && selectedCategory === "planTrip" ? (
-              <div className="inline-flex justify-center items-center h-[46px] w-[46px] bg-orange1 rounded-full text-white text-[22px] font-bold">
-                {selectedTrips.length}
-              </div>
-            ) : (
-              <></>
-            )}
-            <button
-              className="inline-flex justify-center items-center h-[46px] w-[46px] bg-black1 rounded-full text-white outline-none border-none"
-              onClick={() => handleAddTrip(currentTrip)}
-            >
-              <Plus className="h-6 w-6 stroke-[3px]" />
-            </button>
-          </div>
+          {Object.keys(data).length > 0 ? (
+            <div className="w-full inline-flex justify-center mt-2">
+              <button
+                className="text-white inline-flex gap-2 px-2.5 py-1.5 justify-center items-center bg-orange1 rounded-md font-semibold text-[15px]"
+                onClick={() => navigate("/trip-generate")}
+              >
+                <CartIcon className="h-5 w-5 stroke-[3px]" /> View Generated
+                Trip
+                <TiltedArrowIcon className="h-2.5 w-2.5" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex w-full py-2 gap-2 justify-center">
+              {selectedTrips.some(
+                (selectedTrip) => selectedTrip.code === currentTrip.code
+              ) && (
+                <button
+                  className="inline-flex justify-center items-center h-[46px] w-[46px] bg-black1 rounded-full text-white outline-none border-none"
+                  onClick={() => dispatch(setTripRemove(currentTrip.code))}
+                >
+                  <Minus className="h-6 w-6 stroke-[3px]" />
+                </button>
+              )}
+              {selectedTrips.length && selectedCategory === "planTrip" ? (
+                <div className="inline-flex justify-center items-center h-[46px] w-[46px] bg-orange1 rounded-full text-white text-[22px] font-bold">
+                  {selectedTrips.length}
+                </div>
+              ) : (
+                <></>
+              )}
+              <button
+                className="inline-flex justify-center items-center h-[46px] w-[46px] bg-black1 rounded-full text-white outline-none border-none"
+                onClick={() => handleAddTrip(currentTrip)}
+              >
+                <Plus className="h-6 w-6 stroke-[3px]" />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Swipeable MUI Bottom Drawer */}

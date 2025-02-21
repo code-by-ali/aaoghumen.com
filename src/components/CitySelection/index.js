@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { ReactComponent as GlobeIconOrange } from "../../assets/globe-icon-orange.svg";
-import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
-import Temple1 from "../../assets/images/temple-1.png";
-import apiService from "../../services/api/apiServices";
+import { LoaderCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { ReactComponent as GlobeIconOrange } from "../../assets/globe-icon-orange.svg";
+import Temple1 from "../../assets/images/temple-1.png";
+import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
 import { setCity, setStep } from "../../redux/onboarding/onboardingSlice";
-import Spinner from "../Spinner";
+import apiService from "../../services/api/apiServices";
 
 const CitySelection = () => {
   const { city } = useSelector((state) => state.onboarding);
@@ -76,7 +76,16 @@ const CitySelection = () => {
         </div>
 
         {/* Display loading state */}
-        {loading && <Spinner message="Loading, please wait..." />}
+        {loading && (
+          <div className="h-full w-full flex justify-center items-center">
+            <LoaderCircle
+              className="animate-spin ml-1.5 mt-[1px]"
+              size={30}
+              color={"#ED5722"}
+              strokeWidth={3}
+            />
+          </div>
+        )}
 
         {/* Display error state */}
         {error && <p className="text-center text-red-500">{error}</p>}

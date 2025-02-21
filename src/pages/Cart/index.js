@@ -23,7 +23,7 @@ import {
   setTripRemove,
 } from "../../redux/trip/tripSlice";
 import { CustomModal } from "../../components/CustomModal.js";
-import { Home, Trash2 } from "lucide-react";
+import { Home, MapPlus, Trash2 } from "lucide-react";
 
 const StyledFormControl = styled(FormControl)({
   "& .MuiInputLabel-root": {
@@ -74,7 +74,7 @@ const Cart = () => {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isBackDialogOpen, setIsBackDialogOpen] = useState(false);
   const [confirmBack, setConfirmBack] = useState(false);
-  const [amount, setAmount] = useState(300);
+  const [amount, setAmount] = useState(200);
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -101,8 +101,8 @@ const Cart = () => {
   }, [confirmBack, dispatch, navigate]);
 
   useEffect(() => {
-    dispatch(setDropLocation(selectedDrop.code))
-  }, [selectedDrop])
+    dispatch(setDropLocation(selectedDrop.code));
+  }, [selectedDrop]);
 
   const handleDropChange = (event) => {
     // Find the complete location object that matches the selected code
@@ -114,7 +114,7 @@ const Cart = () => {
 
   const handleRemoveAll = (redirectTab) => {
     dispatch(setEmptyCart());
-    dispatch(setDropLocation(''))
+    dispatch(setDropLocation(""));
     dispatch(setActiveTab(redirectTab));
     navigate("/home");
   };
@@ -238,10 +238,9 @@ const Cart = () => {
                       color="error"
                       size="small"
                       onClick={() => {
-                        dispatch(setTripRemove(trip.code))
-                        if(selectedDrop.code === trip.code) {
-                          setSelectedDrop(dropLocations[0])
-
+                        dispatch(setTripRemove(trip.code));
+                        if (selectedDrop.code === trip.code) {
+                          setSelectedDrop(dropLocations[0]);
                         }
                       }}
                     >
@@ -276,6 +275,38 @@ const Cart = () => {
                 Explore Our Top Services
               </p>
               <div className="opacity-60 pointer-events-none">
+                <div className="py-4 px-1 flex items-center gap-3 border-b border-[#B3B8D6]">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        defaultChecked
+                        color="primary"
+                        sx={{
+                          padding: "0px 2px",
+                          marginLeft: 0,
+                          "& .MuiSvgIcon-root": { fontSize: "24px" },
+                          "&.Mui-checked": { color: "#ED5722" },
+                        }}
+                      />
+                    }
+                    sx={{
+                      "& .MuiTypography-root": {
+                        fontFamily: "Public Sans, serif !important",
+                        fontSize: "14px",
+                        color: "#182138",
+                      },
+                      marginLeft: 0,
+                      marginRight: 0,
+                    }}
+                  />
+                  <MapPlus color="#182138" size={30} strokeWidth="1px" />
+                  <div className="flex flex-col text-sm">
+                    <span className="font-semibold text-black1">
+                      Trip with Map
+                    </span>
+                    <span className="font-bold text-orange1">Cost: ₹200</span>
+                  </div>
+                </div>
                 <div className="py-4 px-1 flex items-center gap-3 border-b border-[#B3B8D6]">
                   <FormControlLabel
                     control={
@@ -344,7 +375,6 @@ const Cart = () => {
           <div className="px-4 py-4 bg-black1 text-white flex justify-between items-center">
             <div>
               Total: <strong>₹{amount}</strong>
-              <p className="font-light text-sm">Per person</p>
             </div>
             <button
               className="bg-orange1 rounded-lg font-medium px-3.5 py-2 text-sm"

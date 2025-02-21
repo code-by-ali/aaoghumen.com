@@ -1,17 +1,17 @@
+import { ArrowLeft, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ReactComponent as LanguageIcon } from "../../assets/language-icon.svg";
 import { ReactComponent as SearchIcon } from "../../assets/search-icon.svg";
-import { setLanguage, setStep } from "../../redux/onboarding/onboardingSlice";
-import apiService from "../../services/api/apiServices";
-import Spinner from "../Spinner";
 import {
   setLanguageList,
   setSelectedFilters,
 } from "../../redux/filter/filterSlice";
+import { setLanguage, setStep } from "../../redux/onboarding/onboardingSlice";
+import apiService from "../../services/api/apiServices";
 
 const LanguageSelection = () => {
-  const { language } = useSelector((state) => state.onboarding);
+  const { language, step } = useSelector((state) => state.onboarding);
   const { contentData } = useSelector((state) => state.content);
   const { selectedFilters } = useSelector((state) => state.filter);
   const [allLanguages, setAllLanguages] = useState([]); // Dynamic language list
@@ -71,6 +71,10 @@ const LanguageSelection = () => {
   return (
     <div className="flex flex-col gap-3 transition-all duration-1000 ease-in-out">
       <div className="flex items-center gap-2 px-4 text-orange1">
+        <ArrowLeft
+          className="text-gray-500"
+          onClick={() => dispatch(setStep(step - 1))}
+        />
         <LanguageIcon className="h-6 w-6" />
         <p className="font-bold capitalize">
           {contentData?.selectLanguage || ""}
@@ -89,7 +93,16 @@ const LanguageSelection = () => {
         </div>
 
         {/* Display loading state */}
-        {loading && <Spinner message="Loading, please wait..." />}
+        {loading && (
+          <div className="h-full w-full flex justify-center items-center">
+            <LoaderCircle
+              className="animate-spin ml-1.5 mt-[1px]"
+              size={30}
+              color={"#ED5722"}
+              strokeWidth={3}
+            />
+          </div>
+        )}
 
         {/* Display error state */}
         {error && <p className="text-center text-red-500">{error}</p>}

@@ -11,6 +11,7 @@ import {
   setPreTrips,
 } from "../../redux/trip/tripSlice";
 import apiService from "../../services/api/apiServices";
+import { LoaderCircle } from "lucide-react";
 
 const Home = () => {
   const { activeTab } = useSelector((state) => state.trip);
@@ -65,7 +66,17 @@ const Home = () => {
   }, [selectedFilters]);
 
   const renderPreTrip = () => {
-    if (loading) return <Spinner />;
+    if (loading)
+      return (
+        <div className="h-full w-full flex justify-center items-center">
+          <LoaderCircle
+            className="animate-spin ml-1.5 mt-[1px]"
+            size={40}
+            color={"#ED5722"}
+            strokeWidth={3}
+          />
+        </div>
+      );
     if (preTrips.length === 0)
       return (
         <>
@@ -77,7 +88,17 @@ const Home = () => {
   };
 
   const renderPlanTrip = () => {
-    if (loading) return <Spinner />;
+    if (loading)
+      return (
+        <div className="h-full w-full flex justify-center items-center">
+          <LoaderCircle
+            className="animate-spin ml-1.5 mt-[1px]"
+            size={40}
+            color={"#ED5722"}
+            strokeWidth={3}
+          />
+        </div>
+      );
     if (planTrips.length === 0)
       return (
         <>
@@ -114,8 +135,10 @@ const Home = () => {
         </button>
       </div>
       <hr color="#B3B8D6" />
-      {activeTab === "preTrip" && renderPreTrip()}
-      {activeTab === "planTrip" && renderPlanTrip()}
+      <div className="h-[calc(100vh-126px)] overflow-auto relative">
+        {activeTab === "preTrip" && renderPreTrip()}
+        {activeTab === "planTrip" && renderPlanTrip()}
+      </div>
     </div>
   );
 };
