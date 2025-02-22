@@ -9,12 +9,13 @@ import { ReactComponent as StarIcon } from "../../assets/star-icon.svg";
 import { ReactComponent as TiltedArrowIcon } from "../../assets/tilted-arrow-icon.svg";
 import { ReactComponent as CartIcon } from "../../assets/cart-icon.svg";
 import { setEmptyCart, setPreTripCart } from "../../redux/trip/tripSlice";
-import { Plus, ShoppingCart } from "lucide-react";
+import { Eye, Plus, ShoppingCart } from "lucide-react";
 import CustomAudioPlayer from "../CustomAudioPlayer";
 import FilterButton from "../FilterButton";
 import { useNavigate } from "react-router-dom";
-import { CustomModal } from "../CustomModal.js";
-import PhotoGallery from "../PhotoGallery/index.js";
+import { CustomModal } from "../CustomModal/index.js";
+import { ReactComponent as StyledRightArrowIcon } from "../../assets/styled-right-arrow.svg";
+import ModalComponent from "../ModalComponent/index.js";
 
 const drawerBleeding = 56;
 
@@ -82,6 +83,8 @@ const PreTrip = () => {
   const { preTrips, cart, generatedTrip } = useSelector((state) => state.trip);
   const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [images, setImages] = useState([]);
   const [open, setOpen] = useState(false);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
   const dispatch = useDispatch();
@@ -117,9 +120,30 @@ const PreTrip = () => {
     }
   }
 
+  function handleOpenModal(trip) {
+    let images = [];
+
+    // Loop through all locations and collect images
+    if (trip.tripLocation && Array.isArray(trip.tripLocation)) {
+      trip.tripLocation.forEach((location) => {
+        if (location.images && Array.isArray(location.images)) {
+          images = images.concat(location.images);
+        }
+      });
+    }
+    setImages(images);
+    setModalIsOpen(true);
+  }
+
   return (
     <>
       <FilterButton hidePlaces={true} />
+      <ModalComponent
+        modalIsOpen={modalIsOpen}
+        setModalIsOpen={setModalIsOpen}
+        images={images}
+        setImages={setImages}
+      />
       <CustomModal
         open={isAddTripDialogOpen}
         onClose={() => setIsAddTripDialogOpen(false)}
@@ -154,12 +178,24 @@ const PreTrip = () => {
                     >
                       <StarIcon className="mr-1.5" /> {trip.tripRating}
                     </span>
+                    <span
+                      className="absolute top-3 right-3 bg-white text-black1 
+                text-[14px] font-medium h-7 w-7 flex items-center justify-center rounded-full cursor-pointer"
+                      onClick={() => {
+                        handleOpenModal(trip);
+                      }}
+                    >
+                      <StyledRightArrowIcon className="h-3.5 w-3.5" />
+                    </span>
 
                     <div className="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent text-white text-base gap-2 px-3 items-center flex font-bold py-3">
                       <span className="flex-1">{trip.tripName}</span>
                       <TiltedArrowIcon
                         className="h-3 w-3 cursor-pointer"
-                        onClick={() => setOpen(true)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpen(true);
+                        }}
                       />
                     </div>
                   </div>

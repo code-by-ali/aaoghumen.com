@@ -8,8 +8,10 @@ import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./redux/store";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
+import Modal from "react-modal";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+Modal.setAppElement("#root");
 root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>

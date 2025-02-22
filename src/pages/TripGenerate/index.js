@@ -1,37 +1,51 @@
 import { Box, SwipeableDrawer } from "@mui/material";
+import { differenceInMinutes, format, isSameDay, parse } from "date-fns";
+import { ArrowUp, CircleX, FileDown, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { ReactComponent as PersonIcon } from "../../assets/person-icon.svg";
+import { ReactComponent as PinBaseIcon } from "../../assets/pin-base-icon.svg";
+import { ReactComponent as PinIcon } from "../../assets/pin-icon.svg";
 import { ReactComponent as TitledArrow } from "../../assets/tilted-arrow-icon.svg";
 import { ReactComponent as ViewTimelineIcon } from "../../assets/view-timeline-icon.svg";
-import { ReactComponent as PinIcon } from "../../assets/pin-icon.svg";
-import { ReactComponent as PinBaseIcon } from "../../assets/pin-base-icon.svg";
-import { ReactComponent as PersonIcon } from "../../assets/person-icon.svg";
-import { setGeneratedTripData } from "../../redux/trip/tripSlice";
-import apiService from "../../services/api/apiServices";
-import { ArrowUp, CircleX, FileDown } from "lucide-react";
-import { format, parse } from "date-fns";
-import { TruncatedDescription } from "../../components/PreTrip";
-import Spinner from "../../components/Spinner";
-import { LoaderCircle } from "lucide-react";
-import { CustomModal } from "../../components/CustomModal.js";
 import CircularAudioPlayer from "../../components/CircularAudioPlayer/index.js";
+import { CustomModal } from "../../components/CustomModal";
+import { TruncatedDescription } from "../../components/PreTrip";
+import {
+  setEmptyGeneratedTrip,
+  setGeneratedTripData,
+} from "../../redux/trip/tripSlice";
+import apiService from "../../services/api/apiServices";
 
 const TripGenerate = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { selectedFilters } = useSelector((state) => state.filter);
   const { city } = useSelector((state) => state.onboarding);
   const [drawerHeight, setDrawerHeight] = useState("55%");
-  const { selectedTrips, dropLocation, data } = useSelector(
+  const { selectedTrips, dropLocation, data, generatedAt } = useSelector(
     (state) => state.trip.generatedTrip
   );
 
   useEffect(() => {
-    if (!Object.keys(data).length) {
-      fetchData();
+    const currentDate = new Date();
+    const tripDate = new Date(generatedAt);
+    if (selectedTrips.length === 0) {
+      toast.error("No Trip Data Available");
+      navigate("/home");
+      return;
     }
+    if (!isSameDay(tripDate, currentDate)) {
+      toast.error("Generated Trip is Expired");
+      navigate("/home");
+      return;
+    }
+    fetchData();
     setIsDrawerOpen(true);
   }, []);
 
@@ -129,17 +143,53 @@ const TripGenerate = () => {
     typeof navigator !== "undefined" &&
     /iPad|iPhone|iPod/.test(navigator.userAgent);
 
+  const calculateTimeDifference = (inTime, outTime) => {
+    const inDateTime = parse(inTime, "HH:mm", new Date());
+    const outDateTime = parse(outTime, "HH:mm", new Date());
+
+    const diffInMinutes = differenceInMinutes(outDateTime, inDateTime);
+    const hours = Math.floor(diffInMinutes / 60);
+    const minutes = diffInMinutes % 60;
+
+    const hourText = hours === 1 ? "hour" : "hours";
+    const minText = minutes === 1 ? "min" : "mins";
+
+    // Only include hours and minutes if they're not zero
+    const hourPart = hours > 0 ? `${hours} ${hourText}` : "";
+    const minPart = minutes > 0 ? `${minutes} ${minText}` : "";
+
+    // Add space between hours and minutes if both exist
+    const separator = hours > 0 && minutes > 0 ? " " : "";
+
+    return `${hourPart}${separator}${minPart}`;
+  };
+
   return (
     <>
+      <CustomModal
+        open={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        title="Want to Cancel this Trip ?"
+        description="Are you sure, you want to cancel this generated trip?"
+        primaryButtonText="Yes, Proceed"
+        primaryButtonColor="primary"
+        onPrimaryAction={() => {
+          dispatch(setEmptyGeneratedTrip());
+          navigate("/home");
+        }}
+      />
       <div className="h-[calc(100vh-58px)] overflow-auto relative">
         {loading ? (
-          <div className="h-full w-full flex justify-center items-center">
+          <div className="h-full w-full flex justify-center items-center flex-col">
             <LoaderCircle
               className="animate-spin ml-1.5 mt-[1px]"
               size={50}
               color={"#ED5722"}
               strokeWidth={3}
             />
+            <p className="text-black1 font-medium text-opacity-80 mt-2 text-center">
+              We are generating your trip, please wait...
+            </p>
           </div>
         ) : (
           <>
@@ -171,19 +221,11 @@ const TripGenerate = () => {
               disableBackdropTransition={!iOS}
               disableDiscovery={iOS}
               hideBackdrop={true}
-              // ModalProps={{
-              //   keepMounted: true,
-              //   disableEnforceFocus: true,
-              //   disableAutoFocus: true,
-              //   disableScrollLock: true,
-              // }}
               PaperProps={{
                 sx: {
                   height: `${drawerHeight} !important`,
                   borderTopLeftRadius: "36px",
                   borderTopRightRadius: "36px",
-                  // overflow: 'visible',
-                  // position: 'relative',
                   boxShadow: "rgba(0, 0, 0, 0.4) 0px -2px 10px 0px !important",
                   "&::before": {
                     content: '""',
@@ -222,12 +264,20 @@ const TripGenerate = () => {
                   <h2 className="text-lg font-bold text-orange1 tracking-wide">
                     View Timeline
                   </h2>
-                  <CircleX
-                    size={30}
-                    strokeWidth={1}
-                    className="text-black1"
-                    onClick={() => setIsDrawerOpen(false)}
-                  />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setIsDialogOpen(true)}
+                      className="bg-gray-300 font-semibold text-sm px-3 py-1 rounded-md outline-none"
+                    >
+                      Cancel Trip
+                    </button>
+                    <CircleX
+                      size={30}
+                      strokeWidth={1}
+                      className="text-black1 cursor-pointer"
+                      onClick={() => setIsDrawerOpen(false)}
+                    />
+                  </div>
                 </div>
                 <div className="px-4 w-full bg-black1 py-2 flex justify-between items-center">
                   <div className="flex gap-2 items-center">
@@ -273,13 +323,20 @@ const TripGenerate = () => {
                         <div className="flex-1 ml-10 flex flex-col gap-1.5 border-b border-dashed border-[#B3B8D6] py-3">
                           <div className="flex items-start justify-between">
                             <span className="flex-1 capitalize font-bold text-black1">
+                              {idx === 0
+                                ? "Pickup from "
+                                : data?.locationDetails?.length - 1 === idx
+                                ? "Drop to "
+                                : ""}
                               {obj?.title}
                             </span>
-                            <span className="text-[11px] text-black1 text-opacity-60 font-semibold mt-1">
-                              {formatTimeToAMPM(obj?.inTime) +
-                                " - " +
-                                formatTimeToAMPM(obj?.outTime)}
-                            </span>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-[11px] text-black1 text-opacity-60 font-semibold mt-1">
+                                {formatTimeToAMPM(obj?.inTime) +
+                                  " - " +
+                                  formatTimeToAMPM(obj?.outTime)}
+                              </span>
+                            </div>
                           </div>
                           <TruncatedDescription
                             description={obj.desc}
@@ -288,7 +345,10 @@ const TripGenerate = () => {
                           <div className="flex gap-1.5 items-center">
                             <PersonIcon />
                             <span className="text-black1 text-opacity-60 font-medium text-[11px]">
-                              45 mins
+                              {calculateTimeDifference(
+                                obj?.inTime,
+                                obj?.outTime
+                              )}
                             </span>
                           </div>
                         </div>

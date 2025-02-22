@@ -20,7 +20,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { se } from "date-fns/locale";
 import { toast } from "react-toastify";
-import { CustomModal } from "../CustomModal.js";
+import { CustomModal } from "../CustomModal";
+import { ReactComponent as StyledRightArrowIcon } from "../../assets/styled-right-arrow.svg";
+import ModalComponent from "../ModalComponent/index.js";
 
 const PlanTrip = () => {
   const navigate = useNavigate();
@@ -28,6 +30,8 @@ const PlanTrip = () => {
   const { planTrips, cart, generatedTrip } = useSelector((state) => state.trip);
   const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [images, setImages] = useState([]);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const { selectedTrips, selectedCategory } = cart;
@@ -61,6 +65,11 @@ const PlanTrip = () => {
     }
   }
 
+  function handleOpenModal(trip) {
+    setImages(trip.image);
+    setModalIsOpen(true);
+  }
+
   return (
     <>
       <FilterButton />
@@ -75,6 +84,12 @@ const PlanTrip = () => {
           dispatch(setEmptyCart());
           dispatch(setPlanTripCart(currentTrip));
         }}
+      />
+      <ModalComponent
+        modalIsOpen={modalIsOpen}
+        setModalIsOpen={setModalIsOpen}
+        images={images}
+        setImages={setImages}
       />
       <div className="h-full relative pb-4">
         <div className="slider-container">
@@ -99,8 +114,17 @@ const PlanTrip = () => {
                       <span className="absolute top-3 left-3 bg-[#FFB61A] text-white text-[14px] font-medium w-[46px] flex items-center justify-center py-0.5 rounded-md">
                         <StarIcon className="mr-1.5" /> {trip.rating}
                       </span>
+                      <span
+                        className="absolute top-3 right-3 bg-white text-black1 
+                                      text-[14px] font-medium h-7 w-7 flex items-center justify-center rounded-full cursor-pointer"
+                        onClick={() => {
+                          handleOpenModal(trip);
+                        }}
+                      >
+                        <StyledRightArrowIcon className="h-3.5 w-3.5" />
+                      </span>
                       {isAddedToCart && (
-                        <span className="absolute top-3 right-3 bg-black1 bg-opacity-40 text-white text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 font-semibold">
+                        <span className="absolute top-3.5 right-[52px] bg-black1 bg-opacity-40 text-white text-xs px-2 py-1 rounded-md inline-flex items-center gap-1 font-semibold">
                           <Check className="h-4 w-4 stroke-[3px]" />
                           Added to Cart
                         </span>

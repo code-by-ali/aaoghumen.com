@@ -22,7 +22,7 @@ import {
   setEmptyCart,
   setTripRemove,
 } from "../../redux/trip/tripSlice";
-import { CustomModal } from "../../components/CustomModal.js";
+import { CustomModal } from "../../components/CustomModal";
 import { Home, MapPlus, Trash2 } from "lucide-react";
 
 const StyledFormControl = styled(FormControl)({
@@ -51,6 +51,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { selectedFilters } = useSelector((state) => state.filter);
+  const { contentData } = useSelector((state) => state.content);
   const { cart } = useSelector((state) => state.trip);
   const { selectedTrips, selectedCategory } = cart;
   const dropLocations = selectedTrips.length
@@ -74,7 +75,7 @@ const Cart = () => {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isBackDialogOpen, setIsBackDialogOpen] = useState(false);
   const [confirmBack, setConfirmBack] = useState(false);
-  const [amount, setAmount] = useState(200);
+  const [amount, setAmount] = useState(contentData?.mapTripAmount || 0);
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -304,7 +305,9 @@ const Cart = () => {
                     <span className="font-semibold text-black1">
                       Trip with Map
                     </span>
-                    <span className="font-bold text-orange1">Cost: ₹200</span>
+                    <span className="font-bold text-orange1">
+                      Cost: ₹{contentData?.mapTripAmount || 0}
+                    </span>
                   </div>
                 </div>
                 <div className="py-4 px-1 flex items-center gap-3 border-b border-[#B3B8D6]">

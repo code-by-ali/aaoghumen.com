@@ -14,7 +14,8 @@ const tripSlice = createSlice({
     generatedTrip: {
       selectedTrips: [],
       dropLocation: "",
-      data: []
+      data: [],
+      generatedAt: "",
     },
   },
   reducers: {
@@ -41,7 +42,7 @@ const tripSlice = createSlice({
       );
     },
     setDropLocation(state, action) {
-      state.cart.dropLocation = action.payload
+      state.cart.dropLocation = action.payload;
     },
     setEmptyCart(state) {
       state.cart.selectedTrips = [];
@@ -49,17 +50,20 @@ const tripSlice = createSlice({
       state.cart.dropLocation = "";
     },
     setGeneratedTripFromCart(state, action) {
-      state.generatedTrip.selectedTrips = action.payload.selectedTrips
-      state.generatedTrip.dropLocation = action.payload.dropLocation
+      const currentDateTime = new Date();
+      state.generatedTrip.selectedTrips = action.payload.selectedTrips;
+      state.generatedTrip.dropLocation = action.payload.dropLocation;
+      state.generatedTrip.generatedAt = currentDateTime.toISOString();
     },
     setGeneratedTripData(state, action) {
-      state.generatedTrip.data = action.payload
+      state.generatedTrip.data = action.payload;
     },
     setEmptyGeneratedTrip(state) {
       state.generatedTrip.selectedTrips = [];
-      state.generatedTrip.data = []
+      state.generatedTrip.data = [];
       state.generatedTrip.dropLocation = "";
-    }
+      state.generatedTrip.generatedAt = "";
+    },
   },
 });
 
@@ -75,6 +79,6 @@ export const {
   setGeneratedTripData,
   setDropLocation,
   setEmptyGeneratedTrip,
-  setGeneratedTripFromCart
+  setGeneratedTripFromCart,
 } = tripSlice.actions;
 export default tripSlice.reducer;
