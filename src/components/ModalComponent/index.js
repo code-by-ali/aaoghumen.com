@@ -1,8 +1,14 @@
 import { X } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import Modal from "react-modal";
-import Slider from "react-slick";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Zoom } from "swiper/modules";
 import FallbackImage from "../../assets/images/fallback-slider-image.png";
+
+// Import Swiper styles
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 const customStyles = {
   content: {
@@ -15,7 +21,7 @@ const customStyles = {
     maxWidth: "500px",
     width: "95%",
     background: "transparent",
-    padding: "60px 20px",
+    padding: "60px 4px",
     border: "none",
     overflow: "hidden",
   },
@@ -33,17 +39,6 @@ function ModalComponent({ modalIsOpen, setModalIsOpen, images, setImages }) {
     setImages([]);
   };
 
-  const settings = useMemo(
-    () => ({
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-    }),
-    []
-  );
-
   return (
     <div>
       <Modal
@@ -52,21 +47,32 @@ function ModalComponent({ modalIsOpen, setModalIsOpen, images, setImages }) {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <button className="absolute top-2.5 right-[14px]" onClick={closeModal}>
+        <button className="absolute top-2.5 -right-[3px]" onClick={closeModal}>
           <X color="white" size={30} />
         </button>
-        <Slider {...settings}>
+
+        <Swiper
+          modules={[Navigation, Pagination]}
+          navigation
+          pagination={{ clickable: true }}
+          spaceBetween={10}
+          slidesPerView={1}
+          speed={500}
+          loop={true}
+        >
           {images.map((image, index) => (
-            <img
-              src={image}
-              className="h-[350px] object-cover"
-              alt={`Temple ${index + 1}`}
-              onError={(e) => {
-                e.target.src = FallbackImage;
-              }}
-            />
+            <SwiperSlide key={index}>
+              <img
+                src={image}
+                className="h-[350px] w-full object-cover rounded-xl"
+                alt={`Temple ${index + 1}`}
+                onError={(e) => {
+                  e.target.src = FallbackImage;
+                }}
+              />
+            </SwiperSlide>
           ))}
-        </Slider>
+        </Swiper>
       </Modal>
     </div>
   );

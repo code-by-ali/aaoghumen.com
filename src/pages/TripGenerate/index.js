@@ -139,10 +139,6 @@ const TripGenerate = () => {
     }
   };
 
-  const iOS =
-    typeof navigator !== "undefined" &&
-    /iPad|iPhone|iPod/.test(navigator.userAgent);
-
   const calculateTimeDifference = (inTime, outTime) => {
     const inDateTime = parse(inTime, "HH:mm", new Date());
     const outDateTime = parse(outTime, "HH:mm", new Date());
@@ -218,8 +214,6 @@ const TripGenerate = () => {
               onOpen={toggleDrawer(true)}
               swipeAreaWidth={0}
               disableSwipeToOpen={true}
-              disableBackdropTransition={!iOS}
-              disableDiscovery={iOS}
               hideBackdrop={true}
               PaperProps={{
                 sx: {

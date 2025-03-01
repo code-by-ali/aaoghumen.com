@@ -36,9 +36,16 @@
   }
 }
 .custom-player .rhap_progress-filled {
-  background-color: #4f46e5;
+  background-color: #ed572291;
+}
+.swiper-button-prev,
+.swiper-button-next {
+  color: #f7f7f7e0;
 }
 
+.swiper-pagination-bullet-active {
+  background: #f7f7f7e0;
+}
 .custom-player .rhap_progress-indicator {
   background: #fff;
 }
