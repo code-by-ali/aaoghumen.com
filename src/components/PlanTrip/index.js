@@ -28,6 +28,8 @@ const PlanTrip = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { planTrips, cart, generatedTrip } = useSelector((state) => state.trip);
+  const { selectedFilters } = useSelector((state) => state.filter);
+  const travellingTime = selectedFilters["Traveling Time"]?.code || 0;
   const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -55,10 +57,16 @@ const PlanTrip = () => {
   function handleAddTrip(trip) {
     if (selectedCategory !== "preTrip") {
       const isDuplicate = selectedTrips.find((obj) => obj.code === trip.code);
-      if (isDuplicate === undefined) {
-        dispatch(setPlanTripCart(trip));
+      if (travellingTime > selectedTrips.length) {
+        if (isDuplicate === undefined) {
+          dispatch(setPlanTripCart(trip));
+        } else {
+          toast.error(trip.name + " is already added in the cart");
+        }
       } else {
-        toast.error(trip.name + " is already added in the cart");
+        toast.error(
+          `Cannot add trips more than ${selectedTrips.length}, increase travelling hours to add more!`
+        );
       }
     } else {
       setIsAddTripDialogOpen(true);
@@ -68,6 +76,21 @@ const PlanTrip = () => {
   function handleOpenModal(trip) {
     setImages(trip.image);
     setModalIsOpen(true);
+  }
+
+  function handleCartRedirect() {
+    if (selectedTrips?.length > 0) {
+      if (selectedTrips?.length > travellingTime) {
+        const remaining = selectedTrips?.length - travellingTime;
+        toast.error(
+          `Kindly remove ${remaining} ${
+            remaining === 1 ? "trip" : "trips"
+          } to match with your selected hours`
+        );
+      } else {
+        navigate("/cart");
+      }
+    }
   }
 
   return (
@@ -266,9 +289,9 @@ const PlanTrip = () => {
         {/* Fixed button at bottom */}
         <div
           className={`fixed bottom-0 left-0 right-0 bg-orange1 max-w-[430px] mx-auto flex items-center justify-center font-semibold text-white h-14 text-[17px] gap-2 underline underline-offset-2 z-[9999] ${
-            cart.selectedTrips?.length === 0 ? "bg-opacity-50" : ""
+            selectedTrips?.length === 0 ? "bg-opacity-50" : ""
           }`}
-          onClick={() => navigate("/cart")}
+          onClick={handleCartRedirect}
         >
           <CartIcon className="h-6 w-6" /> View Cart{" "}
           <TiltedArrowIcon className="h-3 w-3" />
@@ -278,4 +301,4 @@ const PlanTrip = () => {
   );
 };
 
-export default PlanTrip;
+export default React.memo(PlanTrip);

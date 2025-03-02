@@ -18,6 +18,7 @@ import {
   setGeneratedTripData,
 } from "../../redux/trip/tripSlice";
 import apiService from "../../services/api/apiServices";
+import { saveAs } from "file-saver";
 
 const TripGenerate = () => {
   const dispatch = useDispatch();
@@ -118,25 +119,8 @@ const TripGenerate = () => {
       }}
     />
   );
-  const handlePdfDownload = async () => {
-    const pdfUrl = data.pdf; // Replace with your actual PDF URL
-    try {
-      const response = await fetch(pdfUrl);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.setAttribute("download", "sample.pdf"); // Set the file name
-      document.body.appendChild(link);
-      link.click();
-
-      // Clean up
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Error downloading the PDF:", error);
-    }
+  const handlePdfDownload = () => {
+    saveAs(data.pdf, "sample.pdf");
   };
 
   const calculateTimeDifference = (inTime, outTime) => {

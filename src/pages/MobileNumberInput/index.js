@@ -69,10 +69,14 @@ const MobileNumberInput = () => {
         <div className="flex items-start mt-4">
           <input
             type="checkbox"
-            className="mr-3 min-h-4 min-w-4 accent-orange1 outline-none"
+            id="termsCheckbox"
+            className="mr-3 min-h-[18px] min-w-[18px] accent-orange1 outline-none"
             required
           />
-          <label className="text-sm text-opacity-60 text-black1">
+          <label
+            htmlFor="termsCheckbox"
+            className="text-sm text-opacity-60 text-black1"
+          >
             By using this app, you agree to our{" "}
             <strong className="text-orange1">Terms and Conditions</strong> and{" "}
             <strong className="text-orange1">Privacy Policy</strong>.

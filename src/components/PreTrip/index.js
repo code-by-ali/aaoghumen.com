@@ -344,4 +344,4 @@ const PreTrip = () => {
   );
 };
 
-export default PreTrip;
+export default React.memo(PreTrip);
