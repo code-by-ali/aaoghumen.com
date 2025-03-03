@@ -125,3 +125,15 @@
   height: calc(70% - 56px);
   overflow: visible;
 }
+
+/* By default, the close button is hidden */
+.gtclose-button {
+  display: none;
+}
+
+/* Show the close button only on screens larger than 768px (typical tablet/desktop breakpoint) */
+@media screen and (min-width: 768px) {
+  .gtclose-button {
+    display: block; /* or display: flex, inline, etc. depending on your layout needs */
+  }
+}

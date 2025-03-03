@@ -1,6 +1,6 @@
 import { Box, SwipeableDrawer } from "@mui/material";
 import { differenceInMinutes, format, isSameDay, parse } from "date-fns";
-import { ArrowUp, CircleX, FileDown, LoaderCircle } from "lucide-react";
+import { ArrowUp, CircleX, FileDown, Home, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -26,8 +26,10 @@ const TripGenerate = () => {
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [tripFailed, setTripFailed] = useState(false);
   const { selectedFilters } = useSelector((state) => state.filter);
   const { city } = useSelector((state) => state.onboarding);
+  const { contentData } = useSelector((state) => state.content);
   const [drawerHeight, setDrawerHeight] = useState("55%");
   const { selectedTrips, dropLocation, data, generatedAt } = useSelector(
     (state) => state.trip.generatedTrip
@@ -81,8 +83,10 @@ const TripGenerate = () => {
       if (response.statusCode === 200 && response.data.length) {
         dispatch(setGeneratedTripData(response.data[0]));
         setIsDrawerOpen(true); // Open drawer by default when data loads
+        setTripFailed(false);
       } else {
-        toast.error("Failed to get generated trip data");
+        setIsDrawerOpen(false);
+        setTripFailed(true);
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -121,6 +125,26 @@ const TripGenerate = () => {
   );
   const handlePdfDownload = () => {
     saveAs(data.pdf, "sample.pdf");
+    // fetch(data.pdf)
+    //   .then((response) => response.blob())
+    //   .then((blob) => {
+    //     // Create a blob URL
+    //     const blobUrl = URL.createObjectURL(blob);
+
+    //     // Create a temporary anchor element
+    //     const link = document.createElement("a");
+    //     link.href = blobUrl;
+    //     link.download = "sample.pdf";
+
+    //     // Append to the document, click it, and remove it
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+
+    //     // Clean up the blob URL
+    //     URL.revokeObjectURL(blobUrl);
+    //   })
+    //   .catch((error) => console.error("Error downloading the PDF:", error));
   };
 
   const calculateTimeDifference = (inTime, outTime) => {
@@ -170,6 +194,21 @@ const TripGenerate = () => {
             <p className="text-black1 font-medium text-opacity-80 mt-2 text-center">
               We are generating your trip, please wait...
             </p>
+          </div>
+        ) : tripFailed ? (
+          <div className="h-full w-full flex justify-center items-center flex-col">
+            <p className="font-semibold text-lg mb-2 text-center">
+              {contentData?.tripNotGenerated || ""}
+            </p>
+            <button
+              className="text-white inline-flex gap-1 px-2 py-1.5 justify-center items-center bg-orange1 rounded-md"
+              onClick={() => {
+                dispatch(setEmptyGeneratedTrip());
+                navigate("/home");
+              }}
+            >
+              <Home className="h-5 w-5 stroke-[2px]" /> Go Home
+            </button>
           </div>
         ) : (
           <>
@@ -252,7 +291,7 @@ const TripGenerate = () => {
                     <CircleX
                       size={30}
                       strokeWidth={1}
-                      className="text-black1 cursor-pointer"
+                      className="gtclose-button text-black1 cursor-pointer"
                       onClick={() => setIsDrawerOpen(false)}
                     />
                   </div>
