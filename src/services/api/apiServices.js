@@ -82,9 +82,9 @@ const apiService = {
       throw error;
     }
   },
-  cashFreeCreateOrder: async (body) => {
+  createOrder: async (body) => {
     try {
-      const response = await api.post(endpoints.CASH_FREE_CREATE_ORDER, body);
+      const response = await api.post(endpoints.CREATE_ORDER, body);
       return response;
     } catch (error) {
       throw error;

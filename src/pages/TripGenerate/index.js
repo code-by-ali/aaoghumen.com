@@ -1,5 +1,6 @@
 import { Box, SwipeableDrawer } from "@mui/material";
 import { differenceInMinutes, format, isSameDay, parse } from "date-fns";
+import { saveAs } from "file-saver";
 import { ArrowUp, CircleX, FileDown, Home, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,7 +19,6 @@ import {
   setGeneratedTripData,
 } from "../../redux/trip/tripSlice";
 import apiService from "../../services/api/apiServices";
-import { saveAs } from "file-saver";
 
 const TripGenerate = () => {
   const dispatch = useDispatch();
@@ -27,13 +27,13 @@ const TripGenerate = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [tripFailed, setTripFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { selectedFilters } = useSelector((state) => state.filter);
   const { city } = useSelector((state) => state.onboarding);
   const { contentData } = useSelector((state) => state.content);
   const [drawerHeight, setDrawerHeight] = useState("55%");
-  const { selectedTrips, dropLocation, data, generatedAt } = useSelector(
-    (state) => state.trip.generatedTrip
-  );
+  const { selectedTrips, dropLocation, data, generatedAt, paymentId } =
+    useSelector((state) => state.trip.generatedTrip);
 
   useEffect(() => {
     const currentDate = new Date();
@@ -77,6 +77,7 @@ const TripGenerate = () => {
         tripLocations: selectedTrips.join(","),
         mobile: localStorage.getItem("verified-mobile"),
         dropOffLocation: dropLocation,
+        paymentId,
       };
 
       const response = await apiService.getGeneratedTrip(body);
@@ -84,9 +85,11 @@ const TripGenerate = () => {
         dispatch(setGeneratedTripData(response.data[0]));
         setIsDrawerOpen(true); // Open drawer by default when data loads
         setTripFailed(false);
+        setErrorMessage("");
       } else {
         setIsDrawerOpen(false);
         setTripFailed(true);
+        setErrorMessage(response.message);
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
@@ -198,7 +201,7 @@ const TripGenerate = () => {
         ) : tripFailed ? (
           <div className="h-full w-full flex justify-center items-center flex-col">
             <p className="font-semibold text-lg mb-2 text-center">
-              {contentData?.tripNotGenerated || ""}
+              {errorMessage || contentData?.tripNotGenerated || ""}
             </p>
             <button
               className="text-white inline-flex gap-1 px-2 py-1.5 justify-center items-center bg-orange1 rounded-md"

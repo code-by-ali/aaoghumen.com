@@ -37,12 +37,12 @@ const Failed = () => {
       <XCircle size={50} color="#ef4444" />
       <p className="text-2xl font-extrabold text-black1">Payment Failed!</p>
       <p className="text-black1 font-medium text-opacity-80 text-center">
-        We couldn't process your payment. Please try again or use a different
-        payment method.
+        We couldn't process your payment. Please try again later or use a
+        different payment method.
       </p>
       <div className="mt-4 text-sm text-black1 text-opacity-70 flex flex-col items-center gap-1">
         <p className="animate-pulse">Please do not refresh the page</p>
-        <p>Redirecting you to payment page in {countdown}s...</p>
+        <p>Redirecting you to Home page in {countdown}s...</p>
       </div>
     </div>
   );

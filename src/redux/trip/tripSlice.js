@@ -16,6 +16,7 @@ const tripSlice = createSlice({
       dropLocation: "",
       data: [],
       generatedAt: "",
+      paymentId: "",
     },
   },
   reducers: {
@@ -54,6 +55,7 @@ const tripSlice = createSlice({
       state.generatedTrip.selectedTrips = action.payload.selectedTrips;
       state.generatedTrip.dropLocation = action.payload.dropLocation;
       state.generatedTrip.generatedAt = currentDateTime.toISOString();
+      state.generatedTrip.paymentId = action.payload.paymentId;
     },
     setGeneratedTripData(state, action) {
       state.generatedTrip.data = action.payload;
@@ -63,6 +65,7 @@ const tripSlice = createSlice({
       state.generatedTrip.data = [];
       state.generatedTrip.dropLocation = "";
       state.generatedTrip.generatedAt = "";
+      state.generatedTrip.paymentId = "";
     },
   },
 });
