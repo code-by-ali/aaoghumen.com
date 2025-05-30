@@ -3,6 +3,11 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import apiService from "../../services/api/apiServices";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setEmptyCart,
+  setGeneratedTripFromCart,
+} from "../../redux/trip/tripSlice";
 
 const OTP_TIMER = 120; // Timer duration in seconds (2 minutes)
 
@@ -22,13 +27,24 @@ const VerificationCodeInput = () => {
   ];
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const phone = location.state?.phone || "N/A";
   var otp = location.state?.otp || "";
   var amount = location.state?.amount || 0;
 
+  const { contentData } = useSelector((state) => state.content);
+  const { cart } = useSelector((state) => state.trip);
+  const { selectedTrips, selectedCategory, dropLocation } = cart;
+  const { byPass } = contentData;
+
+  // Pre-fill "123456" if byPass is true
   useEffect(() => {
-    inputRefs[0].current?.focus();
-  }, []);
+    if (byPass) {
+      setCode(["1", "2", "3", "4", "5", "6"]);
+    } else {
+      inputRefs[0].current?.focus();
+    }
+  }, [byPass]);
 
   useEffect(() => {
     if (timeLeft > 0) {
@@ -80,15 +96,40 @@ const VerificationCodeInput = () => {
   // Handle OTP Submission
   async function handleSubmit() {
     if (code.join("").length === 6) {
-      console.log("Submitted code:", code.join(""));
       if (code.join("") === otp) {
         localStorage.setItem("verified-mobile", phone);
         toast.success("OTP is successfully verified");
-        navigate("/payment", { state: { amount } });
+        if (byPass) {
+          handleRedirect();
+        } else {
+          navigate("/payment", { state: { amount } });
+        }
       } else {
         toast.error("OTP is incorrect");
       }
     }
+  }
+
+  function handleRedirect() {
+    var locations;
+    if (selectedCategory === "preTrip") {
+      if (selectedTrips.length) {
+        locations = selectedTrips[0].tripLocation.map(
+          (obj) => obj.locationCode
+        );
+      }
+    } else {
+      locations = selectedTrips?.map((obj) => obj.code);
+    }
+    dispatch(
+      setGeneratedTripFromCart({
+        selectedTrips: locations,
+        dropLocation,
+        paymentId: "",
+      })
+    );
+    dispatch(setEmptyCart());
+    navigate("/trip-generate");
   }
 
   // Resend OTP

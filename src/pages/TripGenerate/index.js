@@ -32,18 +32,24 @@ const TripGenerate = () => {
   const { city } = useSelector((state) => state.onboarding);
   const { contentData } = useSelector((state) => state.content);
   const [drawerHeight, setDrawerHeight] = useState("55%");
-  const { selectedTrips, dropLocation, data, generatedAt, paymentId } =
-    useSelector((state) => state.trip.generatedTrip);
+  const {
+    selectedTrips,
+    dropLocation,
+    data,
+    generatedAt,
+    paymentId,
+    selectedTime,
+  } = useSelector((state) => state.trip.generatedTrip);
 
   useEffect(() => {
     const currentDate = new Date();
     const tripDate = new Date(generatedAt);
-    if (selectedTrips.length === 0) {
+    if (selectedTrips.length === 0 && !contentData.byPass) {
       toast.error("No Trip Data Available");
       navigate("/home");
       return;
     }
-    if (!isSameDay(tripDate, currentDate)) {
+    if (!isSameDay(tripDate, currentDate) && !contentData.byPass) {
       toast.error("Generated Trip is Expired");
       navigate("/home");
       return;
@@ -72,12 +78,14 @@ const TripGenerate = () => {
       const body = {
         cityName: city?.cityName,
         language: selectedFilters?.Languages.code,
-        hours: String(selectedFilters["Traveling Time"].code),
+        hours:
+          String(selectedTime) ||
+          String(selectedFilters["Traveling Time"].code),
         currentLocation: selectedFilters["Current Location"].code,
         tripLocations: selectedTrips.join(","),
         mobile: localStorage.getItem("verified-mobile"),
         dropOffLocation: dropLocation,
-        paymentId,
+        paymentId: contentData.byPass ? "" : paymentId,
       };
 
       const response = await apiService.getGeneratedTrip(body);

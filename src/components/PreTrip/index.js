@@ -1,20 +1,25 @@
 import { styled } from "@mui/material/styles";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
+import { Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import { Plus } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
+import { ReactComponent as CartIcon } from "../../assets/cart-icon.svg";
 import FallbackImage from "../../assets/images/fallback-slider-image.png";
 import { ReactComponent as PlusIconBlack } from "../../assets/plus-icon-black.svg";
 import { ReactComponent as StarIcon } from "../../assets/star-icon.svg";
-import { ReactComponent as TiltedArrowIcon } from "../../assets/tilted-arrow-icon.svg";
-import { ReactComponent as CartIcon } from "../../assets/cart-icon.svg";
-import { setEmptyCart, setPreTripCart } from "../../redux/trip/tripSlice";
-import { Eye, Plus, ShoppingCart } from "lucide-react";
-import CustomAudioPlayer from "../CustomAudioPlayer";
-import FilterButton from "../FilterButton";
-import { useNavigate } from "react-router-dom";
-import { CustomModal } from "../CustomModal/index.js";
 import { ReactComponent as StyledRightArrowIcon } from "../../assets/styled-right-arrow.svg";
+import { ReactComponent as TiltedArrowIcon } from "../../assets/tilted-arrow-icon.svg";
+import {
+  setEmptyCart,
+  setPreTripCart,
+  setPreTripTime,
+} from "../../redux/trip/tripSlice";
+import CustomAudioPlayer from "../CustomAudioPlayer";
+import { CustomModal } from "../CustomModal/index.js";
+import FilterButton from "../FilterButton";
 import ModalComponent from "../ModalComponent/index.js";
 
 const drawerBleeding = 56;
@@ -39,6 +44,24 @@ const Puller = styled("div")(({ theme }) => ({
   top: 8,
   left: "calc(50% - 25px)",
 }));
+
+// const StyledFormControl = styled(FormControl)({
+//   "& .MuiInputLabel-root": {
+//     fontFamily: "Public Sans, serif", // Replace with your desired font
+//     fontSize: "14px",
+//   },
+//   "& .MuiSelect-select": {
+//     fontFamily: "Public Sans, serif",
+//     fontSize: "14px",
+//     padding: "10px 14px",
+//   },
+//   "& .MuiMenuItem-root": {
+//     fontFamily: "Public Sans, serif",
+//     "& fieldset": {
+//       borderColor: "#ED5722", // matching your border color from above
+//     },
+//   },
+// });
 
 // Custom component for truncated description
 export const TruncatedDescription = ({
@@ -79,6 +102,83 @@ export const TruncatedDescription = ({
   );
 };
 
+// Time Selection Modal Component
+const TimeSelectionModal = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  timeOptions,
+  tripName,
+}) => {
+  const [selectedTime, setSelectedTime] = useState("");
+
+  // Convert 24-hour format to 12-hour format with AM/PM
+  const formatTime = (hour) => {
+    if (hour === 0) return "12:00 AM";
+    if (hour < 12) return `${hour}:00 AM`;
+    if (hour === 12) return "12:00 PM";
+    return `${hour - 12}:00 PM`;
+  };
+
+  const formattedTimeOptions = timeOptions.map((hour) => ({
+    value: hour,
+    label: formatTime(hour),
+  }));
+
+  // Reset selected time when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setSelectedTime("");
+    }
+  }, [isOpen]);
+
+  const handleConfirm = () => {
+    if (selectedTime !== "") {
+      onConfirm(selectedTime);
+      onClose();
+    }
+  };
+
+  const handleTimeChange = (event) => {
+    setSelectedTime(event.target.value);
+  };
+
+  return (
+    <CustomModal
+      open={isOpen}
+      onClose={onClose}
+      title="Select Trip Start Time"
+      primaryButtonText="Add to Cart"
+      primaryButtonColor="primary"
+      onPrimaryAction={handleConfirm}
+      primaryButtonDisabled={selectedTime === ""}
+    >
+      <div className="px-4 py-2">
+        <p className="text-sm text-gray-600 mb-4">This trip will start from:</p>
+
+        <FormControl fullWidth>
+          {" "}
+          {/* Added size="small" */}
+          <InputLabel id="time-select-label">Select Start Time</InputLabel>
+          <Select
+            labelId="time-select-label"
+            id="time-label-select"
+            value={selectedTime}
+            onChange={handleTimeChange}
+            label="Select start time"
+          >
+            {formattedTimeOptions.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
+    </CustomModal>
+  );
+};
+
 const PreTrip = () => {
   const { preTrips, cart, generatedTrip } = useSelector((state) => state.trip);
   const { data } = generatedTrip;
@@ -87,6 +187,9 @@ const PreTrip = () => {
   const [images, setImages] = useState([]);
   const [open, setOpen] = useState(false);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
+  const [isTimeSelectionOpen, setIsTimeSelectionOpen] = useState(false);
+  const [selectedTripForTime, setSelectedTripForTime] = useState(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { selectedTrips, selectedCategory } = cart;
@@ -112,11 +215,40 @@ const PreTrip = () => {
   const currentTrip = preTrips[activeIndex] || {};
 
   function handleAddTrip(trip) {
+    // Check if trip has timing options
+    if (
+      trip.tripLocation &&
+      trip.tripLocation[0] &&
+      trip.tripLocation[0].tripTiming &&
+      trip.tripLocation[0].tripTiming.length > 0
+    ) {
+      // Show time selection modal
+      setSelectedTripForTime(trip);
+      setIsTimeSelectionOpen(true);
+    } else {
+      // Proceed without time selection
+      proceedWithAddTrip(trip);
+    }
+  }
+
+  function proceedWithAddTrip(trip, selectedStartTime = null) {
+    const tripWithTime = selectedStartTime
+      ? { ...trip, selectedStartTime }
+      : trip;
+
     if (selectedCategory === "planTrip" && selectedTrips.length) {
       setIsAddTripDialogOpen(true);
     } else {
-      dispatch(setPreTripCart([trip]));
+      dispatch(setPreTripCart([tripWithTime]));
+      dispatch(setPreTripTime(selectedStartTime));
       navigate("/cart");
+    }
+  }
+
+  function handleTimeSelection(selectedTime) {
+    if (selectedTripForTime) {
+      proceedWithAddTrip(selectedTripForTime, selectedTime);
+      setSelectedTripForTime(null);
     }
   }
 
@@ -144,6 +276,19 @@ const PreTrip = () => {
         images={images}
         setImages={setImages}
       />
+
+      {/* Time Selection Modal */}
+      <TimeSelectionModal
+        isOpen={isTimeSelectionOpen}
+        onClose={() => {
+          setIsTimeSelectionOpen(false);
+          setSelectedTripForTime(null);
+        }}
+        onConfirm={handleTimeSelection}
+        timeOptions={selectedTripForTime?.tripLocation?.[0]?.tripTiming || []}
+        tripName={selectedTripForTime?.tripName || ""}
+      />
+
       <CustomModal
         open={isAddTripDialogOpen}
         onClose={() => setIsAddTripDialogOpen(false)}
@@ -153,10 +298,18 @@ const PreTrip = () => {
         primaryButtonColor="primary"
         onPrimaryAction={() => {
           dispatch(setEmptyCart());
-          dispatch(setPreTripCart([currentTrip]));
+          const tripToAdd =
+            selectedTripForTime && currentTrip.selectedStartTime
+              ? {
+                  ...currentTrip,
+                  selectedStartTime: currentTrip.selectedStartTime,
+                }
+              : currentTrip;
+          dispatch(setPreTripCart([tripToAdd]));
           navigate("/cart");
         }}
       />
+
       <Root>
         <div className="slider-container">
           <Slider {...settings}>
@@ -302,13 +455,13 @@ const PreTrip = () => {
               </p>
               <hr color="#B3B8D6" />
               <div className="divide-y-2 divide-dashed mb-4">
-                {currentTrip.tripLocation.map((trip, index) => (
+                {currentTrip.tripLocation?.map((trip, index) => (
                   <div key={index} className="flex flex-col py-3 gap-2">
                     <div className="flex items-center gap-3">
                       <img
                         className="w-9 h-9 rounded-md"
                         src={
-                          trip.images.length ? trip.images[0] : FallbackImage
+                          trip.images?.length ? trip.images[0] : FallbackImage
                         }
                         alt=""
                         onError={(e) => {

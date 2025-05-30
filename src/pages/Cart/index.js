@@ -20,6 +20,7 @@ import {
   setActiveTab,
   setDropLocation,
   setEmptyCart,
+  setGeneratedTripFromCart,
   setTripRemove,
 } from "../../redux/trip/tripSlice";
 import { CustomModal } from "../../components/CustomModal";
@@ -52,8 +53,9 @@ const Cart = () => {
   const navigate = useNavigate();
   const { selectedFilters } = useSelector((state) => state.filter);
   const { contentData } = useSelector((state) => state.content);
+  const { byPass } = contentData;
   const { cart } = useSelector((state) => state.trip);
-  const { selectedTrips, selectedCategory } = cart;
+  const { selectedTrips, selectedCategory, dropLocation, selectedTime } = cart;
   const dropLocations = selectedTrips.length
     ? selectedCategory === "preTrip"
       ? [
@@ -75,7 +77,7 @@ const Cart = () => {
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [isBackDialogOpen, setIsBackDialogOpen] = useState(false);
   const [confirmBack, setConfirmBack] = useState(false);
-  const [amount, setAmount] = useState(contentData?.mapTripAmount || 0);
+  const [amount, setAmount] = useState(byPass ? 0 : contentData?.mapTripAmount);
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -123,10 +125,37 @@ const Cart = () => {
   function redirectToMobilePage() {
     const mobile = localStorage.getItem("verified-mobile");
     if (mobile) {
-      navigate("/payment", { state: { amount } });
+      if (byPass) {
+        handleRedirect();
+      } else {
+        navigate("/payment", { state: { amount } });
+      }
     } else {
       navigate("/enter-mobile", { state: { amount } });
     }
+  }
+
+  function handleRedirect() {
+    var locations;
+    if (selectedCategory === "preTrip") {
+      if (selectedTrips.length) {
+        locations = selectedTrips[0].tripLocation.map(
+          (obj) => obj.locationCode
+        );
+      }
+    } else {
+      locations = selectedTrips?.map((obj) => obj.code);
+    }
+    dispatch(
+      setGeneratedTripFromCart({
+        selectedTrips: locations,
+        dropLocation,
+        paymentId: "",
+        selectedTime,
+      })
+    );
+    dispatch(setEmptyCart());
+    navigate("/trip-generate");
   }
 
   return (
@@ -306,7 +335,15 @@ const Cart = () => {
                       Trip with Map
                     </span>
                     <span className="font-bold text-orange1">
-                      Cost: ₹{contentData?.mapTripAmount || 0}
+                      Cost:
+                      <span className={`ml-1 ${byPass ? "line-through" : ""}`}>
+                        ₹{contentData?.mapTripAmount || 0}
+                      </span>{" "}
+                      <span
+                        className={`ml-1 ${byPass ? "inline-flex" : "hidden"}`}
+                      >
+                        ₹0
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -338,7 +375,17 @@ const Cart = () => {
                     <span className="font-semibold text-black1">
                       Ride Service
                     </span>
-                    <span className="font-bold text-orange1">Cost: ₹350</span>
+                    <span className="font-bold text-orange1">
+                      Cost:{" "}
+                      <span className={`${byPass ? "line-through" : ""}`}>
+                        ₹350
+                      </span>{" "}
+                      <span
+                        className={`ml-1 ${byPass ? "inline-flex" : "hidden"}`}
+                      >
+                        ₹0
+                      </span>
+                    </span>
                   </div>
                 </div>
                 <div className="py-4 px-1 flex items-center gap-3 border-b border-[#B3B8D6]">
@@ -369,7 +416,17 @@ const Cart = () => {
                     <span className="font-semibold text-black1">
                       Tour Guide
                     </span>
-                    <span className="font-bold text-orange1">Cost: ₹850</span>
+                    <span className="font-bold text-orange1">
+                      Cost:{" "}
+                      <span className={`${byPass ? "line-through" : ""}`}>
+                        ₹850
+                      </span>{" "}
+                      <span
+                        className={`ml-1 ${byPass ? "inline-flex" : "hidden"}`}
+                      >
+                        ₹0
+                      </span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -377,7 +434,7 @@ const Cart = () => {
           </div>
           <div className="px-4 py-4 bg-black1 text-white flex justify-between items-center">
             <div>
-              Total: <strong>₹{amount}</strong>
+              Total: <strong>₹{amount} </strong>
             </div>
             <button
               className="bg-orange1 rounded-lg font-medium px-3.5 py-2 text-sm"

@@ -1,15 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { RESET_APP } from "../actions";
+
+const initialState = {
+  city: "",
+  time: "",
+  language: "",
+  pickPoint: "",
+  category: "",
+  step: 0,
+};
 
 const onboardingSlice = createSlice({
   name: "onboarding",
-  initialState: {
-    city: "",
-    time: "",
-    language: "",
-    pickPoint: "",
-    category: "",
-    step: 0,
-  },
+  initialState,
   reducers: {
     setCity(state, action) {
       state.city = action.payload;
@@ -29,6 +32,9 @@ const onboardingSlice = createSlice({
     setStep(state, action) {
       state.step = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(RESET_APP, () => initialState);
   },
 });
 

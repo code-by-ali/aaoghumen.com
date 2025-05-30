@@ -19,14 +19,23 @@ const Home = () => {
   const { city } = useSelector((state) => state.onboarding);
   const { selectedFilters, categories } = useSelector((state) => state.filter);
   const { contentData } = useSelector((state) => state.content);
-  const [loading, setLoading] = useState(false);
+
+  // Separate loading states
+  const [preTripLoading, setPreTripLoading] = useState(false);
+  const [planTripLoading, setPlanTripLoading] = useState(false);
   const [preTripError, setPreTripError] = useState(null);
   const [planTripError, setPlanTripError] = useState(null);
+  // Local state for filtered pre-trips
+  const [filteredPreTrips, setFilteredPreTrips] = useState(preTrips);
+
   const dispatch = useDispatch();
 
   const defaultPlaces = categories.map((obj) => obj.code)?.join(",");
 
-  const fetchData = async () => {
+  // Fetch PreTrip data (only once)
+  const fetchPreTripData = async () => {
+    if (preTrips.length > 0) return; // Don't fetch if already loaded
+
     const preTripBody = {
       cityName: city.cityName,
       category: "Mix1",
@@ -35,21 +44,32 @@ const Home = () => {
       currentTimeMin: String(8 * 60),
       currentLocation: selectedFilters["Current Location"].code,
     };
-    const planTripBody = {
-      cityName: city.cityName,
-      // category: "Temples",
-      category: selectedFilters.Places.length
-        ? selectedFilters.Places.map((obj) => obj.code)?.join(",")
-        : defaultPlaces,
-      language: selectedFilters.Languages.code,
-    };
-    setLoading(true);
+
+    setPreTripLoading(true);
+    setPreTripError(null);
+
     try {
       const preTripsResponse = await apiService.getPreTrips(preTripBody);
       dispatch(setPreTrips(preTripsResponse || []));
     } catch (err) {
       setPreTripError("Failed to fetch Pre Trips. Please try again.");
+    } finally {
+      setPreTripLoading(false);
     }
+  };
+
+  // Fetch PlanTrip data (every time filters change)
+  const fetchPlanTripData = async () => {
+    const planTripBody = {
+      cityName: city.cityName,
+      category: selectedFilters.Places.length
+        ? selectedFilters.Places.map((obj) => obj.code)?.join(",")
+        : defaultPlaces,
+      language: selectedFilters.Languages.code,
+    };
+
+    setPlanTripLoading(true);
+    setPlanTripError(null);
 
     try {
       const planTripsResponse = await apiService.getPlanTrips(planTripBody);
@@ -57,16 +77,43 @@ const Home = () => {
     } catch (err) {
       setPlanTripError("Failed to fetch Plan Trips. Please try again.");
     } finally {
-      setLoading(false);
+      setPlanTripLoading(false);
     }
   };
 
+  // Filter preTrips locally without modifying Redux state
+  function fetchPreTripLocal() {
+    const currentLocation = selectedFilters["Current Location"].code;
+    const hours = String(selectedFilters["Traveling Time"].code);
+
+    // Filter preTrips based on startLocation and tripDuration
+    const filtered = preTrips.filter((trip) => {
+      return (
+        trip.startLocation === currentLocation &&
+        String(trip.tripDuration) === hours
+      );
+    });
+
+    // Update local state with filtered data
+    setFilteredPreTrips(filtered);
+  }
+
   useEffect(() => {
-    fetchData();
+    fetchPreTripData();
+  }, []);
+
+  useEffect(() => {
+    fetchPlanTripData();
+    fetchPreTripLocal();
   }, [selectedFilters]);
 
+  // Update filteredPreTrips when preTrips changes (e.g., after initial fetch)
+  useEffect(() => {
+    setFilteredPreTrips(preTrips);
+  }, [preTrips]);
+
   const renderPreTrip = () => {
-    if (loading)
+    if (preTripLoading) {
       return (
         <div className="h-full w-full flex justify-center items-center">
           <LoaderCircle
@@ -77,18 +124,31 @@ const Home = () => {
           />
         </div>
       );
-    if (preTrips.length === 0)
+    }
+
+    if (preTripError) {
+      return (
+        <>
+          <div className="p-3 text-red-500">{preTripError}</div>
+          <FilterButton />
+        </>
+      );
+    }
+
+    if (filteredPreTrips.length === 0) {
       return (
         <>
           <div className="p-3">No Pre Trip data available</div>
           <FilterButton />
         </>
       );
-    return <PreTrip />;
+    }
+
+    return <PreTrip preTrips={filteredPreTrips} />;
   };
 
   const renderPlanTrip = () => {
-    if (loading)
+    if (planTripLoading) {
       return (
         <div className="h-full w-full flex justify-center items-center">
           <LoaderCircle
@@ -99,13 +159,26 @@ const Home = () => {
           />
         </div>
       );
-    if (planTrips.length === 0)
+    }
+
+    if (planTripError) {
+      return (
+        <>
+          <div className="p-3 text-red-500">{planTripError}</div>
+          <FilterButton />
+        </>
+      );
+    }
+
+    if (planTrips.length === 0) {
       return (
         <>
           <div className="p-3">No Plan Trip data available</div>
           <FilterButton />
         </>
       );
+    }
+
     return <PlanTrip />;
   };
 

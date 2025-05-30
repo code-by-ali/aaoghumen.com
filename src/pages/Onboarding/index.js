@@ -42,6 +42,8 @@ const Onboarding = () => {
       console.log("Failed to fetch Categories. Please try again.");
     } finally {
       setLoading(false);
+      // Store current timestamp in localStorage
+      localStorage.setItem("lastFetchTime", new Date().toISOString());
       navigate("/home");
     }
   };

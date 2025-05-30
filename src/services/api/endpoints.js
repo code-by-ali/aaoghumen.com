@@ -4,7 +4,7 @@ const endpoints = {
   GET_PICK_POINTS: "/cityLocations",
   GET_HOURS: "/hours",
   GET_CATEGORIES: "/cityCategory",
-  GET_PRE_TRIPS: "preDefineTrips",
+  GET_PRE_TRIPS: "getAllTrips",
   GET_PLAN_TRIPS: "planLocations",
   GET_STATIC_CONTENT: "staticConstant",
   GET_MOBILE_OTP: "mobileOtp",

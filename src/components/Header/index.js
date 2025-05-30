@@ -6,6 +6,10 @@ import { ReactComponent as DropdownIcon } from "../../assets/dropdown-icon.svg";
 import HeaderLogo from "../../assets/images/header-logo.png";
 import { setTime } from "../../redux/onboarding/onboardingSlice";
 import { setSelectedFilters } from "../../redux/filter/filterSlice";
+import { setContent } from "../../redux/content/contentSlice";
+import apiService from "../../services/api/apiServices";
+import { persistor } from "../../redux/store";
+import { resetApp } from "../../redux/actions";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -20,6 +24,32 @@ const Header = () => {
     if (step !== 5) {
       navigate("/");
       return;
+    }
+    const fetchData = async () => {
+      try {
+        const response = await apiService.getStaticContent();
+        dispatch(setContent(response));
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+    fetchData();
+
+    // Check if last fetch time exceeds 24 hours
+    const lastFetchTime = localStorage.getItem("lastFetchTime");
+    if (lastFetchTime) {
+      const lastFetchDate = new Date(lastFetchTime);
+      const currentDate = new Date();
+      const timeDiff = (currentDate - lastFetchDate) / (1000 * 60 * 60); // Convert to hours
+      if (timeDiff >= 24) {
+        try {
+          // Clear Redux Persist state
+          dispatch(resetApp());
+          navigate("/");
+        } catch (error) {
+          console.error("Error purging persistor:", error);
+        }
+      }
     }
   }, []);
 

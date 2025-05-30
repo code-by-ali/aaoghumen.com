@@ -1,20 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { RESET_APP } from "../actions";
+
+const initialState = {
+  cities: [],
+  hours: [],
+  categories: [],
+  languages: [],
+  pickPoints: [],
+  selectedFilters: {
+    Places: [],
+    Languages: [],
+    "Traveling Time": [],
+    "Current Location": [],
+  },
+};
 
 const filterSlice = createSlice({
   name: "filter",
-  initialState: {
-    cities: [],
-    hours: [],
-    categories: [],
-    languages: [],
-    pickPoints: [],
-    selectedFilters: {
-      Places: [],
-      Languages: [],
-      "Traveling Time": [],
-      "Current Location": [],
-    },
-  },
+  initialState,
   reducers: {
     setCityList(state, action) {
       state.cities = action.payload;
@@ -37,6 +40,9 @@ const filterSlice = createSlice({
     resetFilters(state, action) {
       state.selectedFilters = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(RESET_APP, () => initialState);
   },
 });
 

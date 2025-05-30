@@ -82,8 +82,6 @@ const PaymentPage = () => {
       description: "Trip Booking Payment",
       order_id: orderData.rpOrderId,
       handler: async (response) => {
-        console.log(response);
-
         handleRedirect(response.razorpay_payment_id);
       },
       prefill: {
@@ -111,7 +109,7 @@ const PaymentPage = () => {
         const response = await apiService.createOrder({
           mobile: phone,
           amount: String(amount),
-          returnUrl: "https://aaoghumen.vercel.app/payment-status",
+          returnUrl: "https://aaoghumen.com/payment-status",
         });
         if (response.statusCode === 200) {
           openCashfreePopup(response.data.paymentSessionId);
@@ -123,7 +121,7 @@ const PaymentPage = () => {
         const response = await apiService.createOrder({
           mobile: phone,
           amount: String(amount),
-          returnUrl: "https://aaoghumen.vercel.app/payment-status",
+          returnUrl: "https://aaoghumen.com/payment-status",
         });
 
         if (response.statusCode === 200) {

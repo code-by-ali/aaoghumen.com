@@ -1,14 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-
+import { RESET_APP } from "../actions";
+const initialState = {
+  contentData: {},
+};
 const contentSlice = createSlice({
   name: "content",
-  initialState: {
-    contentData: {},
-  },
+  initialState,
   reducers: {
     setContent(state, action) {
       state.contentData = action.payload;
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(RESET_APP, () => initialState);
   },
 });
 
