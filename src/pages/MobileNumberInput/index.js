@@ -19,7 +19,7 @@ const MobileNumberInput = () => {
   const { contentData } = useSelector((state) => state.content);
   const { cart } = useSelector((state) => state.trip);
   const { selectedTrips, selectedCategory, dropLocation } = cart;
-  const { byPass } = contentData;
+  const { byPass, terms, policy } = contentData;
 
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, ""); // Allow only digits
@@ -115,8 +115,14 @@ const MobileNumberInput = () => {
             className="text-sm text-opacity-60 text-black1"
           >
             By using this app, you agree to our{" "}
-            <strong className="text-orange1">Terms and Conditions</strong> and{" "}
-            <strong className="text-orange1">Privacy Policy</strong>.
+            <a href={terms} target="_blank">
+              <strong className="text-orange1">Terms and Conditions</strong>
+            </a>{" "}
+            and{" "}
+            <a href={policy} target="_blank">
+              <strong className="text-orange1">Privacy Policy</strong>
+            </a>
+            .
           </label>
         </div>
 

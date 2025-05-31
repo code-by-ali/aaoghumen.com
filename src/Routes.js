@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   BrowserRouter,
   Routes as MainRoutes,
+  Navigate,
   Route,
   useLocation,
   useNavigate,
@@ -12,15 +13,15 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./components/Header";
 import Cart from "./pages/Cart";
 import Home from "./pages/Home";
-import Onboarding from "./pages/Onboarding";
-import SplashScreen from "./pages/SplashScreen";
 import MobileNumberInput from "./pages/MobileNumberInput";
-import VerificationCodeInput from "./pages/VerificationCodeInput";
+import Onboarding from "./pages/Onboarding";
 import PaymentPage from "./pages/PaymentPage";
-import Success from "./pages/PaymentPage/Success";
 import Failed from "./pages/PaymentPage/Failed";
-import TripGenerate from "./pages/TripGenerate";
 import Status from "./pages/PaymentPage/Status";
+import Success from "./pages/PaymentPage/Success";
+import SplashScreen from "./pages/SplashScreen";
+import TripGenerate from "./pages/TripGenerate";
+import VerificationCodeInput from "./pages/VerificationCodeInput";
 
 const Routes = () => {
   const location = useLocation();
@@ -33,11 +34,12 @@ const Routes = () => {
   ];
   const onboarding = useSelector((state) => state.onboarding);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (!onboarding.city && onboarding.step === 0) {
       navigate("/");
     }
-  }, []);
+  }, [navigate, onboarding.city, onboarding.step]);
 
   return (
     <>
@@ -71,6 +73,7 @@ const Routes = () => {
             <Route path="/payment-failed" element={<Failed />} />
             <Route path="/trip-generate" element={<TripGenerate />} />
             <Route path="/payment-status" element={<Status />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
           </MainRoutes>
         </div>
       </div>

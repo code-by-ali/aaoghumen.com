@@ -199,7 +199,7 @@ const TripGenerate = () => {
         open={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         title="Want to Cancel this Trip ?"
-        description="Are you sure, you want to cancel this generated trip?"
+        description="Are you sure, you want to cancel this generated trip? If yes please download PDF file before cancelling."
         primaryButtonText="Yes, Proceed"
         primaryButtonColor="primary"
         onPrimaryAction={() => {

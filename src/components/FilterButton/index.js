@@ -159,7 +159,7 @@ const FilterButton = ({ hidePlaces = false }) => {
   return (
     <>
       <div
-        className="filter-button z-[9999] absolute bottom-24 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
+        className="filter-button z-[9999] absolute bottom-6 right-2 rounded-full h-12 w-12 bg-orange1 flex items-center justify-center cursor-pointer"
         onClick={toggleDrawer(true)}
       >
         <FilterIcon className="h-5 w-5" />

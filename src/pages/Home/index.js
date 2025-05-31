@@ -116,12 +116,15 @@ const Home = () => {
     if (preTripLoading) {
       return (
         <div className="h-full w-full flex justify-center items-center">
-          <LoaderCircle
-            className="animate-spin ml-1.5 mt-[1px]"
-            size={40}
-            color={"#ED5722"}
-            strokeWidth={3}
-          />
+          <div className="flex flex-col items-center justify-center">
+            <LoaderCircle
+              className="animate-spin ml-1.5 mt-[1px]"
+              size={40}
+              color={"#ED5722"}
+              strokeWidth={3}
+            />
+            <span className="mt-1">Please wait while trips are loading!</span>
+          </div>
         </div>
       );
     }
@@ -184,7 +187,7 @@ const Home = () => {
 
   return (
     <div>
-      <TourGuide />
+      {preTrips.length > 0 && <TourGuide />}
       <div className="flex px-3 py-4 capitalize">
         <button
           onClick={() => dispatch(setActiveTab("preTrip"))}
@@ -208,7 +211,7 @@ const Home = () => {
         </button>
       </div>
       <hr color="#B3B8D6" />
-      <div className="h-[calc(100vh-126px)] overflow-auto relative">
+      <div className="h-[calc(100vh-184px)] overflow-auto relative">
         {activeTab === "preTrip" && renderPreTrip()}
         {activeTab === "planTrip" && renderPlanTrip()}
       </div>
