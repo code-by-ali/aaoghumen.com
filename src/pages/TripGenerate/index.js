@@ -1,5 +1,12 @@
 import { Box, SwipeableDrawer } from "@mui/material";
-import { differenceInMinutes, format, isSameDay, parse } from "date-fns";
+import {
+  differenceInMinutes,
+  format,
+  getHours,
+  getMinutes,
+  isSameDay,
+  parse,
+} from "date-fns";
 import { saveAs } from "file-saver";
 import { ArrowUp, CircleX, FileDown, Home, LoaderCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -72,15 +79,22 @@ const TripGenerate = () => {
     };
   }, []);
 
+  function getCurrentTime() {
+    const now = new Date();
+    const hours = getHours(now);
+    const minutes = getMinutes(now);
+    const totalMinutes = hours * 60 + minutes;
+    return String(totalMinutes);
+  }
+
   async function fetchData() {
     setLoading(true);
     try {
       const body = {
         cityName: city?.cityName,
         language: selectedFilters?.Languages.code,
-        hours:
-          String(selectedTime) ||
-          String(selectedFilters["Traveling Time"].code),
+        hours: String(selectedFilters["Traveling Time"].code),
+        currentTime: selectedTime ? selectedTime * 60 : getCurrentTime(),
         currentLocation: selectedFilters["Current Location"].code,
         tripLocations: selectedTrips.join(","),
         mobile: localStorage.getItem("verified-mobile"),

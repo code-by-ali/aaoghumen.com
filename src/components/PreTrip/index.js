@@ -45,40 +45,58 @@ const Puller = styled("div")(({ theme }) => ({
   left: "calc(50% - 25px)",
 }));
 
-// const StyledFormControl = styled(FormControl)({
-//   "& .MuiInputLabel-root": {
-//     fontFamily: "Public Sans, serif", // Replace with your desired font
-//     fontSize: "14px",
-//   },
-//   "& .MuiSelect-select": {
-//     fontFamily: "Public Sans, serif",
-//     fontSize: "14px",
-//     padding: "10px 14px",
-//   },
-//   "& .MuiMenuItem-root": {
-//     fontFamily: "Public Sans, serif",
-//     "& fieldset": {
-//       borderColor: "#ED5722", // matching your border color from above
-//     },
-//   },
-// });
+// Video Modal Component
+const VideoModal = ({ isOpen, onClose, videoUrl }) => {
+  return (
+    <CustomModal
+      open={isOpen}
+      onClose={onClose}
+      title="Demo Trip Video"
+      primaryButtonText="Close"
+      primaryButtonColor="primary"
+      showSecondaryButton={false}
+      onPrimaryAction={onClose}
+    >
+      <div className="px-4 py-4">
+        {videoUrl ? (
+          <video
+            controls
+            className="w-full rounded-lg"
+            style={{ maxHeight: "400px" }}
+          >
+            <source src={videoUrl} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <p className="text-sm text-gray-600">No video available</p>
+        )}
+      </div>
+    </CustomModal>
+  );
+};
 
 // Custom component for truncated description
 export const TruncatedDescription = ({
-  description,
+  description = "",
   open,
   maxLength = 100,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  // Reset expanded state when drawer closes
   useEffect(() => {
     if (!open) {
       setIsExpanded(false);
     }
   }, [open]);
 
-  // If description is shorter than max length, show full description
+  if (!description) {
+    return (
+      <p className="text-[13px]" style={{ color: "rgba(24, 33, 56, 0.6)" }}>
+        No Description Available
+      </p>
+    );
+  }
+
   if (description.length <= maxLength) {
     return (
       <p className="text-[13px]" style={{ color: "rgba(24, 33, 56, 0.6)" }}>
@@ -112,7 +130,6 @@ const TimeSelectionModal = ({
 }) => {
   const [selectedTime, setSelectedTime] = useState("");
 
-  // Convert 24-hour format to 12-hour format with AM/PM
   const formatTime = (hour) => {
     if (hour === 0) return "12:00 AM";
     if (hour < 12) return `${hour}:00 AM`;
@@ -125,7 +142,6 @@ const TimeSelectionModal = ({
     label: formatTime(hour),
   }));
 
-  // Reset selected time when modal opens
   useEffect(() => {
     if (isOpen) {
       setSelectedTime("");
@@ -155,10 +171,7 @@ const TimeSelectionModal = ({
     >
       <div className="px-4 py-2">
         <p className="text-sm text-gray-600 mb-4">This trip will start from:</p>
-
         <FormControl fullWidth>
-          {" "}
-          {/* Added size="small" */}
           <InputLabel id="time-select-label">Select Start Time</InputLabel>
           <Select
             labelId="time-select-label"
@@ -181,9 +194,11 @@ const TimeSelectionModal = ({
 
 const PreTrip = () => {
   const { preTrips, cart, generatedTrip } = useSelector((state) => state.trip);
+  const { demoTrip } = useSelector((state) => state.content.contentData);
   const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [videoModalIsOpen, setVideoModalIsOpen] = useState(false); // New state for video modal
   const [images, setImages] = useState([]);
   const [open, setOpen] = useState(false);
   const [isAddTripDialogOpen, setIsAddTripDialogOpen] = useState(false);
@@ -215,18 +230,15 @@ const PreTrip = () => {
   const currentTrip = preTrips[activeIndex] || {};
 
   function handleAddTrip(trip) {
-    // Check if trip has timing options
     if (
       trip.tripLocation &&
       trip.tripLocation[0] &&
       trip.tripLocation[0].tripTiming &&
       trip.tripLocation[0].tripTiming.length > 0
     ) {
-      // Show time selection modal
       setSelectedTripForTime(trip);
       setIsTimeSelectionOpen(true);
     } else {
-      // Proceed without time selection
       proceedWithAddTrip(trip);
     }
   }
@@ -254,8 +266,6 @@ const PreTrip = () => {
 
   function handleOpenModal(trip) {
     let images = [];
-
-    // Loop through all locations and collect images
     if (trip.tripLocation && Array.isArray(trip.tripLocation)) {
       trip.tripLocation.forEach((location) => {
         if (location.images && Array.isArray(location.images)) {
@@ -267,6 +277,13 @@ const PreTrip = () => {
     setModalIsOpen(true);
   }
 
+  // Function to handle opening the video modal
+  function handleOpenVideoModal() {
+    if (demoTrip) {
+      setVideoModalIsOpen(true);
+    }
+  }
+
   return (
     <>
       <FilterButton hidePlaces={true} />
@@ -276,8 +293,12 @@ const PreTrip = () => {
         images={images}
         setImages={setImages}
       />
-
-      {/* Time Selection Modal */}
+      {/* Video Modal */}
+      <VideoModal
+        isOpen={videoModalIsOpen}
+        onClose={() => setVideoModalIsOpen(false)}
+        videoUrl={demoTrip}
+      />
       <TimeSelectionModal
         isOpen={isTimeSelectionOpen}
         onClose={() => {
@@ -288,7 +309,6 @@ const PreTrip = () => {
         timeOptions={selectedTripForTime?.tripLocation?.[0]?.tripTiming || []}
         tripName={selectedTripForTime?.tripName || ""}
       />
-
       <CustomModal
         open={isAddTripDialogOpen}
         onClose={() => setIsAddTripDialogOpen(false)}
@@ -309,7 +329,6 @@ const PreTrip = () => {
           navigate("/cart");
         }}
       />
-
       <Root>
         <div className="slider-container">
           <Slider {...settings}>
@@ -340,7 +359,6 @@ const PreTrip = () => {
                     >
                       <StyledRightArrowIcon className="h-3.5 w-3.5" />
                     </span>
-
                     <div className="absolute bottom-0 w-full bg-gradient-to-t from-black to-transparent text-white text-base gap-2 px-3 items-center flex font-bold py-3">
                       <span className="flex-1">{trip.tripName}</span>
                       <TiltedArrowIcon
@@ -484,7 +502,11 @@ const PreTrip = () => {
                   </div>
                 ))}
                 <div className="w-full flex justify-center items-center py-3 border-t-[1px] border-dashed">
-                  <button className="text-orange1 font-semibold border border-orange1 rounded-xl h-12 flex items-center justify-center w-3/5">
+                  <button
+                    className="text-orange1 font-semibold border border-orange1 rounded-xl h-12 flex items-center justify-center w-3/5"
+                    onClick={handleOpenVideoModal}
+                    disabled={!demoTrip} // Disable button if no video URL
+                  >
                     Demo Trip
                   </button>
                 </div>
