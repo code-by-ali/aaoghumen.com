@@ -192,8 +192,9 @@ const TimeSelectionModal = ({
   );
 };
 
-const PreTrip = () => {
-  const { preTrips, cart, generatedTrip } = useSelector((state) => state.trip);
+const PreTrip = (props) => {
+  const { preTrips } = props;
+  const { cart, generatedTrip } = useSelector((state) => state.trip);
   const { demoTrip } = useSelector((state) => state.content.contentData);
   const { data } = generatedTrip;
   const [activeIndex, setActiveIndex] = useState(0);

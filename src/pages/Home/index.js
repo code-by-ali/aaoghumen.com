@@ -109,7 +109,8 @@ const Home = () => {
 
   // Update filteredPreTrips when preTrips changes (e.g., after initial fetch)
   useEffect(() => {
-    setFilteredPreTrips(preTrips);
+    // setFilteredPreTrips(preTrips);
+    fetchPreTripLocal();
   }, [preTrips]);
 
   const renderPreTrip = () => {

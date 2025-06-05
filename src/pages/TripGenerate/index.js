@@ -334,7 +334,7 @@ const TripGenerate = () => {
                       </span>
                       <span>
                         Number of Locations:{" "}
-                        <strong>{data?.locationDetails?.length || ""}</strong>
+                        <strong>{data?.numberOfLocations || ""}</strong>
                       </span>
                     </div>
                   </div>
