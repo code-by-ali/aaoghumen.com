@@ -9,6 +9,7 @@ import { persistor, store } from "./redux/store";
 import "@radix-ui/themes/styles.css";
 import { Theme } from "@radix-ui/themes";
 import Modal from "react-modal";
+import { HelmetProvider } from "react-helmet-async";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 Modal.setAppElement("#root");
@@ -16,7 +17,9 @@ root.render(
   <Provider store={store}>
     <PersistGate loading={null} persistor={persistor}>
       <Theme>
-        <App />
+        <HelmetProvider>
+          <App />
+        </HelmetProvider>
       </Theme>
     </PersistGate>
   </Provider>
