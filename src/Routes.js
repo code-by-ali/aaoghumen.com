@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import {
   BrowserRouter,
+  HashRouter,
   Routes as MainRoutes,
   Navigate,
   Route,
@@ -83,8 +84,8 @@ const Routes = () => {
 
 export default function RoutesWrapper() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <Routes />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
